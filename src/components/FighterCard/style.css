@@ -1,0 +1,36 @@
+.fighter-box {
+    display: flex;
+    justify-content: center;
+	position: relative;
+    overflow: hidden;
+}
+
+.fighter-box::before {
+	content: '';
+	position: absolute;
+	width: 1000px;
+    height: 500px;
+    z-index: -1;
+    border-radius: 10px;
+	background: repeating-linear-gradient(
+			white 0%,
+			white 7.5px,
+			#4c1259 7.5px,
+			#4c1259 15px,
+			white 15px,
+			white 22.5px,
+			#4c1259 22.5px,
+            #4c1259 30px);
+    transform: rotate(45deg);
+	animation: animate 60s linear infinite;
+}
+
+@keyframes animate {
+	from {
+		background-position: 0;
+	}
+
+	to {
+		background-position: 0 450px;
+	}
+}

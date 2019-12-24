@@ -81,7 +81,7 @@ const useStyles = makeStyles(theme => ({
 
 const appBarLinks = [
     { title: 'Home', link: constants.HOME },
-    { title: 'Summons', link: constants.SUMMONS },
+    { title: 'Summon', link: constants.SUMMON },
     { title: 'Top', link: constants.TOPPULLS }];
 
 const AppBarItem = ({ linkTo, title }) => {

@@ -1,5 +1,7 @@
 export default {
     HOME: '/',
-    SUMMONS: '/summons',
-    TOPPULLS: '/top'
+    SUMMON: '/summon',
+    TOPPULLS: '/top',
+    FIGHTER_URL: 'http://localhost:3000/images/fighters/',
+    BANNER_URL: 'http://localhost:3000/images/banners/',
 };
