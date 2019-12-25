@@ -1,0 +1,21 @@
+.summoner-container {
+    border: 3px solid #BDBDBD;
+    border-radius: 10px;
+    padding: 5px 0;
+}
+
+.summoner-container::before {
+    content: 'Luckiest Multi of today';
+    font-style: 'Roboto';
+    font-size: 1.5rem;
+    display: inline-block;
+    padding: 0 5px;
+    line-height: 25px;
+    height: 25px;
+    background-color:  #3F51B5;
+    color: #fff;
+    position: relative;
+    left: 0%;
+    top: -20px;
+}
+
