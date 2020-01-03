@@ -2,7 +2,7 @@ import React from 'react';
 import Container from '@material-ui/core/Container';
 import './style.css';
 import { makeStyles } from '@material-ui/core/styles';
-import constants from '../../contants';
+import constants from '../../constants';
 import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles(() => ({

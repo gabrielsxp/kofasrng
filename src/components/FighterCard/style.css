@@ -1,35 +1,82 @@
-.fighter-box {
-    display: flex;
-    justify-content: center;
+.fighter-box-fes {
+	display: flex;
+	justify-content: center;
 	position: relative;
-    overflow: hidden;
+	overflow: hidden;
 }
 
-.fighter-box::before {
+.fighter-box-fes::before {
 	content: '';
 	position: absolute;
 	width: 1000px;
-    height: 500px;
-    z-index: -1;
-    border-radius: 10px;
-	background: repeating-linear-gradient(
-			white 0%,
-			white 7.5px,
-			#4c1259 7.5px,
-			#4c1259 15px,
-			white 15px,
-			white 22.5px,
-			#4c1259 22.5px,
-            #4c1259 30px);
-    transform: rotate(45deg);
+	height: 500px;
+	z-index: -1;
+	background: repeating-linear-gradient( white 0%, white 7.5px, #4c1259 7.5px, #4c1259 15px, white 15px, white 22.5px, #4c1259 22.5px, #4c1259 30px);
+	transform: rotate(45deg);
 	animation: animate 60s linear infinite;
+}
+
+.fighter-box-gold {
+	display: flex;
+	justify-content: center;
+	position: relative;
+	overflow: hidden;
+}
+
+.fighter-box-gold::before {
+	content: '';
+	position: absolute;
+	width: 1000px;
+	height: 500px;
+	z-index: -1;
+	background: repeating-linear-gradient( transparent 0%, transparent 7.5px, yellow 7.5px, yellow 15px, transparent 15px, transparent 22.5px, yellow 22.5px, yellow 30px);
+	transform: rotate(45deg);
+	animation: animate 60s linear infinite;
+}
+
+.fighter-card {
+	position: relative;
+	perspective: 500px;
+	z-index: 0;
+}
+
+.content {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	transition: transform 0.5s;
+	transform-style: preserve-3d;
+}
+
+.front, .back {
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	backface-visibility: hidden;
+	border-radius: 10px;
+}
+
+.back {
+	transform: rotateY( 180deg );
+}
+
+.flip {
+	transform: rotateY( 180deg);
+	transition: transform 0.25s;
+}
+
+.selected {
+	border-radius: 15px;
+	border: 5px solid #303F9F;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
 }
 
 @keyframes animate {
 	from {
 		background-position: 0;
 	}
-
 	to {
 		background-position: 0 450px;
 	}
