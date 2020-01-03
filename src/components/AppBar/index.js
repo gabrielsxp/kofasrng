@@ -14,7 +14,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import Logo from '../Logo/index';
 import { Link } from 'react-router-dom';
 import { useLocation } from 'react-router';
-import constants from '../../contants';
+import constants from '../../constants';
 import logo from '../../images/logo.png';
 
 const useStyles = makeStyles(theme => ({
@@ -86,11 +86,11 @@ const appBarLinks = [
 
 const AppBarItem = ({ linkTo, title }) => {
     let location = useLocation();
-    let thisLocation = title ? `/` + (title === 'Home' ? '' : title.toLowerCase(title)) : null;
+    let thisLocation = title.toLowerCase(title);
 
     const classes = useStyles();
-    return <div key={title} className={clsx(classes.itemContainer, location.pathname === thisLocation ? classes.active : '')}>
-        <Link to={linkTo} className={clsx(classes.appBarItem, location.pathname === thisLocation ? classes.activeText : null)}>
+    return <div key={title} className={clsx(classes.itemContainer, location.pathname.includes(thisLocation) ? classes.active : '')}>
+        <Link to={linkTo} className={clsx(classes.appBarItem, location.pathname.includes(thisLocation) ? classes.activeText : null)}>
             <Typography>{title}</Typography>
         </Link>
     </div>

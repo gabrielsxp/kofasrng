@@ -1,0 +1,17 @@
+.single {
+    background: rgb(137, 203, 110);
+    background: linear-gradient(0deg, rgba(137, 203, 110, 1) 0%, rgba(37, 130, 58, 1) 50%, rgba(21, 74, 27, 1) 90%);
+}
+
+.singleCost {
+    background-color: #154a1b;
+}
+
+.multi {
+    background: rgb(163,42,17);
+    background: linear-gradient(0deg, rgba(163,42,17,1) 0%, rgba(189,66,3,1) 50%, rgba(195,85,2,1) 90%);
+}
+
+.multiCost {
+    background-color: #5c100f;
+}
