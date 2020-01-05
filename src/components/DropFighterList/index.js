@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles(theme => ({
     fighterList: {
-        width: '90%',
+        width: '100%',
         border: '3px solid #dedede',
         borderRadius: '5px',
         overflow: 'hidden',
@@ -20,13 +20,7 @@ const useStyles = makeStyles(theme => ({
         padding: theme.spacing(2)
     },
     alignEnd: {
-        [theme.breakpoints.down('md')]: {
-            marginLeft: '20px'
-        },
-        [theme.breakpoints.down('sm')]: {
-            marginLeft: '0px'
-        },
-        marginLeft: '32px'
+        marginLeft: '0px'
     },
     selected: {
         minHeight: '737px',

@@ -5,6 +5,7 @@ import Container from '@material-ui/core/Container';
 import SummonButton from '../SummonButton/index';
 import SummonContainer from '../SummonerContainer/index';
 import Grid from '@material-ui/core/Grid';
+import CustomMessage from '../CustomMessage/index';
 import axios from '../../axios';
 import constants from '../../constants';
 import { useLocation } from 'react-router';
@@ -38,6 +39,7 @@ export default function Summon() {
     const [banner, setBanner] = useState('');
     const [fighters, setFighters] = useState([]);
     const [display, setDisplay] = useState(true);
+    const [error, setError] = useState(false);
 
     const getBanner = async () => {
 
@@ -46,14 +48,22 @@ export default function Summon() {
             let path = '';
             if (paths.length > 2) {
                 path = paths[paths.length - 1];
+                console.log(path);
                 const response = await axios.get(`/banners/slug/${path}`);
                 if (response.data.banner) {
                     setBanner(response.data.banner);
+                } else {
+                    setError(response.data.error);
                 }
             }
         } catch (error) {
             console.log(error);
+            setError('');
         }
+    }
+
+    const handleClose = () => {
+        setError(false);
     }
 
     const changeDisplay = () => {
@@ -66,7 +76,7 @@ export default function Summon() {
         setDisplay(false);
         setTimeout(() => {
             makeSummon(type)
-        }, constants.PRE_SUMMON_TIME);    
+        }, constants.PRE_SUMMON_TIME);
     }
 
     const makeSummon = async (type) => {
@@ -75,9 +85,11 @@ export default function Summon() {
             if (response.data.fighters) {
                 setFighters(response.data.fighters);
                 changeDisplay();
+            } else {
+                setError(response.data.error);
             }
         } catch (error) {
-            console.log(error);
+            //setError(error);
         }
     }
 
@@ -86,12 +98,13 @@ export default function Summon() {
     }, []);
 
     return <div>
+        {error ? <CustomMessage open={error ? true : false} type="error" message={error} handleClose={handleClose} /> : null}
         <Container className={classes.section}>
             <Typography variant="h4">{banner.name} Summon</Typography>
             <hr />
             <Grid container className={classes.alignBanner}>
                 <Grid xs={12} md={6} className={classes.alignBanner}>
-                    <img className={classes.image} src={`${constants.BANNER_URL + banner.image}`} alt={banner.name} />
+                    <img className={classes.image} src={`${banner.createdBy === 'admin' ? constants.BANNER_URL + banner.image : banner.image}`} alt={banner.name} />
                 </Grid>
             </ Grid>
             <Grid container className={classes.alignBanner}>
@@ -100,8 +113,8 @@ export default function Summon() {
                 </Grid>
                 <Grid xs={12}>
                     <div className={classes.actionButtons}>
-                        <SummonButton disabled={display === false} summon={preSummon} type="single" title="Summon x1" cost={banner.cost} />
-                        <SummonButton disabled={display === false} summon={preSummon} type="multi" title="Summon x10" cost={(banner.cost * 9)} />
+                        <SummonButton disabled={!display} summon={preSummon} type="single" title="Summon x1" cost={banner.singleCost} />
+                        <SummonButton disabled={!display} summon={preSummon} type="multi" title="Summon x10" cost={(banner.multiCost)} />
                     </div>
                 </Grid>
             </Grid>

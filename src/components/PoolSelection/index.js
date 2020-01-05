@@ -39,7 +39,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export default function PoolSelection({ pools, poolIndex, handlePoolIndex, deletePool }) {
+export default function PoolSelection({ pools, poolIndex, handlePoolIndex, deletePool, loadFightersFlag }) {
     const classes = useStyles();
     const [enterDeleteMode, setEnterDeleteMode] = useState(false);
 
@@ -79,7 +79,10 @@ export default function PoolSelection({ pools, poolIndex, handlePoolIndex, delet
 
     const handleSelection = (event) => {
         handlePoolIndex(event.target.value);
-        loadFighters(event.target.value);
+        console.log(event.target.value);
+        if(loadFightersFlag){
+            loadFighters(event.target.value);
+        }
     }
 
     return pools && <div className={classes.root}>
