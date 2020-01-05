@@ -8,13 +8,15 @@ import constants from '../../constants';
 const useStyles = makeStyles(theme => ({
     fighter: {
         [theme.breakpoints.down('sm')]: {
-            width: '60px',
-            height: '60px',
+            flex: '1 0 14%',
+            width: '50px',
+            height: '50px',
+            margin: '10px 5px'
         },
         [theme.breakpoints.down('md')]: {
             width: '80px',
             height: '80px',
-            flex: '1 0 15.3%'
+            flex: '1 0 16%'
         },
         flex: '1 0 17%',
         margin: '15px 5px',
@@ -25,15 +27,14 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export default function FighterCard({ fighter, display, flipped, selectFighter, index, selected }) {
+export default function FighterCard({ fighter, display, flipped  }) {
     const classes = useStyles();
 
     return fighter && <>
         <Tooltip title={`${fighter.name} ${fighter.year}`} aria-label={fighter.name}>
-        <div onClick={() => selectFighter(index)} className={clsx(
+        <div className={clsx(
             classes.fighter,
             'fighter-card',
-            selected ? 'selected' : null,
             flipped ? (fighter.rarity === 'Gold' && fighter.isFes ? 'fighter-box-fes' : 
             fighter.rarity === 'Gold' && !fighter.isFes ? 'fighter-box-gold' : null) : null)}>
         <div className={display ? 'content flip' : 'content'}>

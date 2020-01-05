@@ -7,6 +7,8 @@ import FormGroup from '@material-ui/core/FormGroup';
 import FormControl from '@material-ui/core/FormControl';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import BootstrapInput from '../BootstrapInput/index';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -17,7 +19,9 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Loading from '../Loading/index';
 import axios from '../../axios';
 import constants from '../../constants';
-import { Link } from 'react-router-dom';
+import { getCurrentUser } from '../../services/Auth/index';
+import PoolSelection from '../PoolSelection';
+import CustomMessage from '../CustomMessage/index';
 
 const useStyles = makeStyles(theme => ({
     title: {
@@ -80,6 +84,12 @@ const useStyles = makeStyles(theme => ({
         flexDirection: 'column',
         alignItems: 'flex-start',
         marginBottom: '20px'
+    },
+    column: {
+        flexDirection: 'row',
+        [theme.breakpoints.down('md')]: {
+            flexDirection: 'column'
+        }
     }
 }));
 
@@ -89,46 +99,78 @@ export default function BannerContainer() {
     const [name, setName] = useState('');
     const [image, setImage] = useState('');
     const [pools, setPools] = useState([]);
+    const [banners, setBanners] = useState([]);
+    const [updateIndex, setUpdateIndex] = useState(0);
     const [poolIndex, setPoolIndex] = useState(0);
+    const [updateMode, setUpdateMode] = useState(false);
+    const [deleteMode, setDeleteMode] = useState(false);
     const [hasFes, setHasFes] = useState(false);
+    const [hasAS, setHasAS] = useState(false);
     const [fesFighters, setFesFighters] = useState([]);
+    const [ASFighters, setASFighters] = useState([]);
     const [fesRates, setFesRates] = useState([]);
+    const [ASRates, setASRates] = useState([]);
+    const [user, setUser] = useState(null);
+    const [error, setError] = useState(false);
+    const [success, setSuccess] = useState(false);
     const globalRates = {
         value: [0, 19, 93, 99], max: 99, min: 0
     };
     const [rates, setRates] = useState({ ...globalRates });
     const [fesMaxRates, setFesMaxRates] = useState(0);
+    const [ASMaxRates, setASMaxRates] = useState(0);
+    const baseCosts = [{ name: 'Single Summon', value: 100 }, { name: 'Multi Summons', value: 900 }];
+    const [costs, setCosts] = useState([...baseCosts]);
+
+    const loadBanners = async () => {
+        try {
+            const response = await axios.get(`${constants.BASE_URL}/banners/`);
+            if (response.data.banners) {
+                let banners = response.data.banners;
+                setBanners([...banners]);
+                if (updateMode) {
+                    setFields(updateIndex);
+                } else {
+                    resetFields();
+                }
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
 
     const loadPools = async () => {
         try {
             setLoading(true);
             setLoadPools(true);
-            const response = await axios.get(`${constants.BASE_URL}/defaultPool`, {
-                headers: {
-                    Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZTA1NGEyYWUzNjkyNDQ0NDA4NjJmMWMiLCJpYXQiOjE1Nzc4OTc3NzJ9.f-lOe5ER2sSUBzLez6rZHb0vEZcGMSV9jdUEY_-H0m0'
-                }
-            });
-            let pools = response.data.defaultPools;
-            if (pools) {
+            const response = await axios.get(`${constants.BASE_URL}/defaultPool`);
+            console.log(response);
+            var pools = response.data.defaultPools;
+            if (pools.length > 0) {
                 setPools([...pools]);
                 setLoadPools(false);
-                const res = await axios.get(`${constants.BASE_URL}/defaultPool/${pools[poolIndex]._id}`, {
-                    headers: {
-                        Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZTA1NGEyYWUzNjkyNDQ0NDA4NjJmMWMiLCJpYXQiOjE1Nzc4OTc3NzJ9.f-lOe5ER2sSUBzLez6rZHb0vEZcGMSV9jdUEY_-H0m0'
-                    }
-                });
+                const res = await axios.get(`${constants.BASE_URL}/defaultPool/${pools[poolIndex]._id}`);
                 const fighters = res.data.defaultPool.fighters;
                 const fesFighters = fighters.filter(fighter => fighter.isFes);
+                const ASFighters = fighters.filter(fighter => fighter.isAS && !fighter.isFes);
                 const hasFes = fesFighters.length > 0;
+                const hasAS = ASFighters.length > 0;
                 let dist = rates.value[rates.value.length - 1] - rates.value[rates.value.length - 2];
                 if (hasFes) {
                     let fesRates = fesFighters.map((_, index) => (dist * (index)) / (fesFighters.length));
                     setFesRates([...fesRates]);
                 }
-
+                if (hasAS) {
+                    let ASRates = ASFighters.map((_, index) => (dist * (index)) / (ASFighters.length))
+                    setASRates([...ASRates]);
+                }
                 setFesFighters([...fesFighters]);
+                setASFighters([...ASFighters]);
                 setHasFes(hasFes);
-                setFesMaxRates(rates.value[rates.value.length - 1] - rates.value[rates.value.length - 2]);
+                setHasAS(hasAS);
+                setFesMaxRates(dist);
+                setASMaxRates(dist);
                 setLoading(false);
             } else {
                 setLoading(false);
@@ -141,8 +183,128 @@ export default function BannerContainer() {
         }
     }
 
+    const deleteBanner = async () => {
+        try {
+            const response = await axios.delete(`/banner/${banners[updateIndex]._id}`);
+            if (response.data.success) {
+                let b = loadBanners();
+                setBanners([...b]);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const setFields = (index) => {
+        let banner = banners[index];
+        let name = banner.name;
+        let costs = [...baseCosts];
+        costs[0].value = banner.singleCost;
+        costs[1].value = banner.multiCost;
+
+        let poolIndex = pools.findIndex((p) => p._id === banner.pool);
+        let image = banner.image;
+        let rates = { value: banner.rates, min: 0, max: 99 };
+        let fesRates = banner.fesRates.map(r => r.rate);
+        let hasFes = fesRates.length > 0;
+        let asRates = banner.asRates.map(r => r.rate);
+        let hasAS = asRates.length > 0;
+
+        setName(name);
+        setCosts([...costs]);
+        setPoolIndex(poolIndex !== -1 ? poolIndex : 0);
+        setImage(image);
+        setRates({ ...rates });
+        setHasFes(hasFes);
+        if (hasFes) {
+            let max = fesRates[fesRates.length - 1] !== fesRates[fesRates.length - 2] ? fesRates[fesRates.length - 1] - fesRates[fesRates.length - 2]
+                : fesRates[fesRates.length - 1] - fesRates[fesRates.length - 2];
+            setFesMaxRates(max);
+            console.log(fesRates);
+            setFesRates([0, 6]);
+        }
+        setHasAS(asRates);
+        if (hasAS) {
+            //setASMaxRates([...asRates]);
+            setASRates([...asRates]);
+        }
+    }
+
+    const resetFields = () => {
+        setName('');
+        setCosts([...baseCosts]);
+        setPoolIndex(0);
+        setImage('');
+        setRates({ ...globalRates });
+    }
+
+    const handleClose = () => {
+        setError(false);
+    }
+
+    const saveChanges = async () => {
+        let fesFinalRates = fesFighters.map((fighter, index) => {
+            let obj = {
+                fighter: fighter._id, rate: fesRates[index]
+            };
+            return { ...obj };
+        });
+        let asFinalRates = ASFighters.map((fighter, index) => {
+            let obj = {
+                fighter: fighter._id, rate: ASRates[index]
+            };
+            return { ...obj };
+        });
+        const finalObject = {
+            name,
+            image,
+            singleCost: costs[0].value,
+            multiCost: costs[1].value,
+            pool: pools[poolIndex],
+            rates: rates.value,
+            fesRates: [...fesFinalRates],
+            asRates: [...asFinalRates]
+        }
+        if (updateMode) {
+            try {
+                const response = await axios.patch(`${constants.BASE_URL}/banner/${banners[updateIndex]._id}`, {...finalObject})
+                if(response.data.banner){
+                    setSuccess(true);
+                    loadBanners();
+                    setTimeout(() => {
+                        setSuccess(false);
+                    }, 3000);
+                } else {
+                    setError(response.data.error);
+                }
+            } catch(error){
+                setError('Unable to update the banner');
+            }
+        } else {
+            try {
+                const response = await axios.post(`${constants.BASE_URL}/banner`, {...finalObject});
+                if(response.data.banner){
+                    setSuccess(true);
+                    setTimeout(() => {
+                        setSuccess(false);
+                    }, 3000);
+                } else {
+                    setError(response.data.error);
+                }
+            } catch (error) {
+                setError('Unable to create banner right now');
+            }
+        }
+
+        console.log(fesFinalRates, asFinalRates);
+    }
+
     const handleFesRateSlide = (value) => {
         setFesRates(value);
+    }
+
+    const handleASRateSlide = (value) => {
+        setASRates(value);
     }
 
     const handleNameChange = (event) => {
@@ -157,11 +319,26 @@ export default function BannerContainer() {
         setPoolIndex(event.target.value);
     }
 
+    const handleChangeUpdateSelection = (value) => {
+        setUpdateIndex(value);
+        if (updateMode) {
+            setFields(value);
+        } else {
+            resetFields();
+        }
+    }
+
     const handleRateSlide = (value) => {
         setRates({ ...rates, value });
         if (value) {
             setFesMaxRates(value[value.length - 1] - value[value.length - 2]);
         }
+    }
+
+    const handleCostChange = (event, index) => {
+        let c = [...costs];
+        c[index].value = event.target.value;
+        setCosts([...costs]);
     }
 
     const resetInputs = () => {
@@ -176,21 +353,55 @@ export default function BannerContainer() {
         setImage('');
     }
 
+    const handleChangeUpdateMode = (event) => {
+        setUpdateMode(event.target.checked);
+    }
+
     useEffect(() => {
         loadPools();
+        setUser(getCurrentUser());
     }, [poolIndex]);
+
+    useEffect(() => {
+        loadBanners();
+    }, [updateMode]);
 
     const classes = useStyles();
     return <>
+        {
+            error && <CustomMessage message={error} type="error" handleClose={handleClose} open={error ? true : false} />
+        }
         {
             pools && pools.length > 0 ? <Container className={classes.section}>
                 <Grid container>
                     <Grid item xs={12} md={6} className={classes.grid}>
                         <FormGroup>
-                            <FormControl className={classes.space}>
-                                <Typography className={classes.title} variant="h5">Create Banner</Typography>
-                                <TextField size="small" style={{ margin: '15px 0' }} helperText="Must contain at least 6 characters" id="standard-basic" label="Pool Name" variant="outlined" onChange={(event) => handleNameChange(event)} value={name} />
+                            <Typography required className={classes.title} variant="h5">Banner Management</Typography>
+                            <FormControl style={{ marginTop: '10px' }}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox checked={updateMode} onChange={(event) => handleChangeUpdateMode(event)} value="checkedA" />
+                                    }
+                                    label="Update Existing Banner ?"
+                                />
                             </FormControl>
+                            <FormControl>
+                                {
+
+                                    banners && banners.length > 0 && updateMode && <PoolSelection deletePool={deleteBanner} pools={banners} poolIndex={updateIndex} handlePoolIndex={handleChangeUpdateSelection} />
+
+                                }
+                            </FormControl>
+                            <TextField size="small" style={{ margin: '15px 0' }} helperText="Must contain at least 6 characters" id="standard-basic" label="Pool Name" variant="outlined" onChange={(event) => handleNameChange(event)} value={name} />
+                            {
+                                costs && costs.map((c, index) => {
+                                    return <FormControl className={classes.space} key={index}>
+                                        <TextField required type="number" size="small" style={{ margin: '15px 0' }} helperText={
+                                            index === 0 ? 'Numeric value of the cost. Ex: 100' : 'Must be greater or equals the single summon cost'
+                                        } id="standard-basic" label={`${c.name} Cost`} variant="outlined" onChange={(event) => handleCostChange(event, index)} value={costs[index].value} />
+                                    </FormControl>
+                                })
+                            }
                             <FormControl className={classes.space}>
                                 {
                                     pools && <>
@@ -216,7 +427,7 @@ export default function BannerContainer() {
                             </FormControl>
                             <FormControl>
                                 <Typography variant="h6" style={{ marginBottom: '20px' }}>Set Fighter Rates</Typography>
-                                <div style={{ width: '100%', display: 'flex', marginBottom: '50px', justifyContent: 'space-between' }}>
+                                <div style={{ width: '100%', display: 'flex', marginBottom: '50px', justifyContent: 'space-between', flexWrap: 'wrap' }}>
                                     <img className={classes.stepper} src={`${constants.BRONZE_URL}`} alt="Bronze" />
                                     <ArrowRight className={classes.arrowStepper} />
                                     <img className={classes.stepper} src={`${constants.SILVER_URL}`} alt="Silver" />
@@ -260,7 +471,7 @@ export default function BannerContainer() {
                             {
                                 hasFes && <><FormControl style={{ marginTop: '10px' }}>
                                     <Typography variant="h6" style={{ marginBottom: '20px' }}>Set FES Fighters Rates</Typography>
-                                    <div style={{ width: '100%', display: 'flex', marginBottom: '50px', justifyContent: 'flex-start' }}>
+                                    <div style={{ width: '100%', display: 'flex', marginBottom: '50px', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
                                         {
                                             fesFighters && fesFighters.length > 0 && fesFighters.map((fighter, index) => {
                                                 return <div key={index} style={{ display: 'flex', alignItems: 'center' }}>
@@ -269,7 +480,8 @@ export default function BannerContainer() {
                                                         backgroundRepeat: 'no-repeat',
                                                         backgroundSize: 'contain',
                                                         backgroundPosition: 'center',
-                                                        marginRight: '20px'
+                                                        marginRight: '20px',
+                                                        marginBottom: '20px'
                                                     }}></div></Tooltip>
                                                     {fesFighters.length > 1 && index !== fesFighters.length - 1 && <ArrowRight className={classes.arrowStepper} style={{ marginRight: '20px' }} />}
                                                 </div>
@@ -301,7 +513,59 @@ export default function BannerContainer() {
                                                         backgroundPosition: 'center',
                                                         marginRight: '20px'
                                                     }}></div></Tooltip>
-                                                    <Typography>{index === 0 ? fesRates[index].toFixed(2) + "%" : (fesRates[index] - fesRates[index - 1]).toFixed(2) + "%"}</Typography>
+                                                    <Typography>{index === 0 ? fesRates[index] + "%" : (fesRates[index] - fesRates[index - 1]) + "%"}</Typography>
+                                                </div>
+                                            </FormControl>
+                                        })
+                                    }
+                                </>
+                            }
+                            {
+                                hasAS && <><FormControl style={{ marginTop: '10px' }}>
+                                    <Typography variant="h6" style={{ marginBottom: '20px' }}>Set All Star Fighters Rates</Typography>
+                                    <div style={{ width: '100%', display: 'flex', marginBottom: '50px', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
+                                        {
+                                            ASFighters && ASFighters.length > 0 && ASFighters.map((fighter, index) => {
+                                                return <div key={index} style={{ width: '100%', display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                                                    <Tooltip title={fighter.name}><div className={classes.fighter} style={{
+                                                        backgroundImage: `url(${constants.FIGHTER_URL + fighter.year + '/' + fighter.image})`,
+                                                        backgroundRepeat: 'no-repeat',
+                                                        backgroundSize: 'contain',
+                                                        backgroundPosition: 'center',
+                                                        marginRight: '20px',
+                                                        marginBottom: '20px'
+                                                    }}></div></Tooltip>
+                                                    {ASFighters.length > 1 && index !== ASFighters.length - 1 && <ArrowRight className={classes.arrowStepper} style={{ marginRight: '20px' }} />}
+                                                </div>
+                                            })
+                                        }
+                                    </div>
+                                    {
+                                        <Slider
+                                            value={ASRates}
+                                            onChange={(_, newValue) => handleASRateSlide(newValue)}
+                                            aria-labelledby="range-slider"
+                                            valueLabelDisplay="on"
+                                            step={0.1}
+                                            className={classes.slider}
+                                            max={ASMaxRates}
+                                            min={0}
+                                            track={false}
+                                        />
+                                    }
+                                </FormControl>
+                                    {
+                                        ASFighters && ASFighters.map((fighter, index) => {
+                                            return <FormControl className={classes.ratesWrapper} key={index}>
+                                                <div className={classes.centerize}>
+                                                    <Tooltip title={fighter.name} ><div className={classes.fighter} style={{
+                                                        backgroundImage: `url(${constants.FIGHTER_URL + fighter.year + '/' + fighter.image})`,
+                                                        backgroundRepeat: 'no-repeat',
+                                                        backgroundSize: 'contain',
+                                                        backgroundPosition: 'center',
+                                                        marginRight: '20px'
+                                                    }}></div></Tooltip>
+                                                    <Typography>{index === 0 ? ASRates[index].toFixed(2) + "%" : (ASRates[index] - ASRates[index - 1]).toFixed(2) + "%"}</Typography>
                                                 </div>
                                             </FormControl>
                                         })
@@ -314,21 +578,32 @@ export default function BannerContainer() {
                         <FormControl>
                             <Typography style={{ textAlign: 'center' }} className={classes.title} variant="h5">Image Preview</Typography>
                             {
-                                image !== '' && <img className={classes.image} src={image} alt={name} />
+                                user && image !== '' && <img
+                                    className={classes.image}
+                                    src={user.username === 'admin' ? constants.BANNER_URL + image : image}
+                                    alt={name}
+                                />
                             }
                         </FormControl>
                     </Grid>
                 </Grid>
                 <Grid container>
                     <Grid item xs={12} className={classes.buttonWrapper}>
-                        <Button style={{ marginRight: '20px' }} disabled={rates.value[0] !== 0 || rates.value[rates.value.length - 1] !== 99} color="primary" variant="contained">Save Changes</Button>
+                        <Button
+                            disabled={
+                                success ||
+                                rates.value[0] !== 0 ||
+                                rates.value[rates.value.length - 1] !== 99 ||
+                                name.length < 6 ||
+                                (costs[0].value === '' && costs[1].value === '')
+                            }
+                        onClick={() => saveChanges()} style={{ marginRight: '20px' }} color="primary" variant="contained">{success ? 'OK' : 'Save Changes'}</Button>
                         <Button variant="outlined" color="secondary" onClick={() => resetInputs()}>Reset</Button>
                     </Grid>
                 </Grid>
             </Container>
-                : !loadPool && <Container style={{ padding: '80px 0' }}>
+                : !loadPool && <Container style={{ padding: '80px 20px' }}>
                     <Typography variant="h5" style={{ marginBottom: '20px' }}>You do not have any pools yet</Typography>
-                    <Link to={constants.CREATE_POOL} style={{textDecoration: 'none'}}><Button variant="contained" color="primary">Create Pool</Button></Link>
                 </Container>
         }
         {loadPool && <Loading />}

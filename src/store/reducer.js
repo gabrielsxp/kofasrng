@@ -1,17 +1,25 @@
 const initialState = {
-    poolId: 0
+    user: null,
+    currentDashboardItem: 0,
 }
 
-const reducer = (state = initialState, action) => {
-    switch(action.type){
-        case 'SET_POOL_ID': {
-            console.log('OPEN_DRAWER_DASHBOARD');
+const reducer = (state = { ...initialState }, action) => {
+    switch (action.type) {
+        case 'AUTHENTICATED_USER': {
             return {
                 ...state,
-                poolId: action.poolId
+                user: action.user
+            }
+        }
+        case 'CURRENT_DASHBOARD_ITEM': {
+            console.log(action.item);   
+            return {
+                ...state,
+                currentDashboardItem: action.item
             }
         }
         default:
+            console.log('wrong');
             return {
                 ...state
             }

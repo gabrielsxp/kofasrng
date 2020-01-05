@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import './style.css';
 import { makeStyles } from '@material-ui/core/styles';
@@ -16,6 +16,8 @@ import { Link } from 'react-router-dom';
 import { useLocation } from 'react-router';
 import constants from '../../constants';
 import logo from '../../images/logo.png';
+import {logout, getCurrentUser, removeCurrentUser } from '../../services/Auth/index';
+import { useSelector, useDispatch } from 'react-redux';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -76,57 +78,83 @@ const useStyles = makeStyles(theme => ({
     },
     mobileMenuItem: {
         color: theme.palette.primary
+    },
+    shrinkAppBar: {
+        [theme.breakpoints.down('md')]: {
+            marginLeft: '60px',
+            width: `calc(100% - 60px)`
+        },
+        marginLeft: '240px',
+        width: `calc(100% - 240px)`
     }
 }));
+
+
 
 const appBarLinks = [
     { title: 'Home', link: constants.HOME },
     { title: 'Summon', link: constants.SUMMON },
-    { title: 'Top', link: constants.TOPPULLS }];
+    { title: 'Top', link: constants.TOPPULLS }
+];
 
-const AppBarItem = ({ linkTo, title }) => {
+const AppBarItem = ({ linkTo, title, onClick }) => {
     let location = useLocation();
     let thisLocation = title.toLowerCase(title);
 
     const classes = useStyles();
-    return <div key={title} className={clsx(classes.itemContainer, location.pathname.includes(thisLocation) ? classes.active : '')}>
+    return <div onClick={onClick} key={title} className={clsx(classes.itemContainer, location.pathname.includes(thisLocation) ? classes.active : '')}>
         <Link to={linkTo} className={clsx(classes.appBarItem, location.pathname.includes(thisLocation) ? classes.activeText : null)}>
             <Typography>{title}</Typography>
         </Link>
     </div>
 }
 
-const DesktopSection = () => {
+const DesktopSection = ({user, signOut}) => {
     const classes = useStyles();
+
     return <div className={classes.desktopSection}>
         {
             appBarLinks ? appBarLinks.map((item, index) => {
                 return <AppBarItem key={index} linkTo={item.link} title={item.title} />
             }) : null
         }
+        {
+            user !== null ? <>
+                <AppBarItem linkTo={constants.ADMIN} title="Panel" />
+                <AppBarItem onClick={() => signOut()} title="Sign Out" />
+            </> :
+            <>
+                <AppBarItem linkTo={`${constants.SIGN_IN}`} title={"Sign In"} />
+            </>
+        }
     </div>
 }
 
 export default function MainAppBar() {
     const classes = useStyles();
+    let location = useLocation();
+    let thisLocation = location.pathname;
 
     const [openMobileMenu, setOpenMobileMenu] = useState(false);
+    const user = useSelector(state => state.user);
+    const dispatch = useDispatch();
 
     const toggleMenu = () => {
         setOpenMobileMenu(!openMobileMenu);
     }
 
-    const MobileItem = ({linkTo, title}) => {
+    const MobileItem = ({ linkTo, title }) => {
         let location = useLocation();
-        let thisLocation = title ? `/` + (title === 'Home' ? '' : title.toLowerCase(title)) : null;
+        var thisLocation = title ? `/` + (title === 'Home' ? '' : title.toLowerCase(title)) : null;
+        console.log(location.pathname, thisLocation);
 
         return <ListItem button key={title} className={location.pathname === thisLocation ? classes.activeAppBarItemMobile : null}>
-        <Link to={linkTo} className={classes.appBarItemMobile}>
-            <ListItemText className={location.pathname === thisLocation ? classes.activeAppBarItemMobileText : null}>
-                {title}
-            </ListItemText>
-        </Link>
-    </ListItem>
+            <Link to={linkTo} className={classes.appBarItemMobile}>
+                <ListItemText className={location.pathname === thisLocation ? classes.activeAppBarItemMobileText : null}>
+                    {title}
+                </ListItemText>
+            </Link>
+        </ListItem>
     }
 
     const SideList = () => {
@@ -141,16 +169,22 @@ export default function MainAppBar() {
         </div>
     }
 
+    const signOut = () => {
+        logout();
+        removeCurrentUser();
+        dispatch({type: 'AUTHENTICATED_USER', user: null});
+    }
+
     return (
         <div className={classes.root}>
-            <AppBar position="static">
+            <AppBar position="static" className={clsx(thisLocation.includes(constants.ADMIN) && classes.shrinkAppBar)}>
                 <Toolbar>
                     <div className={classes.logo}>
                         <Link to={constants.HOME}>
                             <Logo width={150} source={logo} />
                         </Link>
                     </div>
-                    <DesktopSection />
+                    <DesktopSection user={user} signOut={signOut} />
                     <Drawer anchor="right" open={openMobileMenu} onClose={() => toggleMenu()}>
                         <SideList />
                     </Drawer>

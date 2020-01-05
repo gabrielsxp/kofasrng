@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import clsx from 'clsx';
+import { useDrop } from 'react-dnd';
 import PoolContext from './context';
-import BootstrapInput from '../BootstrapInput/index';
+import CustomMessage from '../CustomMessage/index';
 import PoolSelection from '../PoolSelection/index';
 import FormGroup from '@material-ui/core/FormGroup';
 import Typography from '@material-ui/core/Typography';
@@ -16,7 +18,6 @@ import Button from '@material-ui/core/Button';
 import green from '@material-ui/core/colors/green';
 import axios from '../../axios';
 import constants from '../../constants';
-import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -58,6 +59,10 @@ const useStyles = makeStyles(theme => ({
     success: {
         backgroundColor: green[600],
         color: "#fff"
+    },
+    hovered: {
+        backgroundColor: "#dedede",
+        border: '5px dashed #333'
     }
 }));
 
@@ -80,9 +85,7 @@ export default function PoolContainer() {
         false,
         false
     ]);
-    const [error, setError] = useState([
-        { message: '', occurs: false }
-    ]);
+    const [error, setError] = useState(false);
     const [poolName, setPoolName] = useState('');
     const [useDefaultPool, setUseDefaultPool] = useState(true);
     const [colors, setFightersColors] = useState([
@@ -113,17 +116,15 @@ export default function PoolContainer() {
 
     const loadPools = async () => {
         try {
-            const response = await axios.get(`${constants.BASE_URL}/defaultPool`, {
-                headers: {
-                    Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZTA1NGEyYWUzNjkyNDQ0NDA4NjJmMWMiLCJpYXQiOjE1Nzc4OTc3NzJ9.f-lOe5ER2sSUBzLez6rZHb0vEZcGMSV9jdUEY_-H0m0'
-                }
-            });
+            const response = await axios.get(`${constants.BASE_URL}/defaultPool`);
             if (response.data.defaultPools) {
                 console.log(response.data.defaultPools);
                 setPools(response.data.defaultPools);
+            } else {
+                setError(`Unable to load the pools`);
             }
         } catch (error) {
-            console.log(error);
+            setError(`Unable to load the pools`);
         }
     }
 
@@ -180,11 +181,11 @@ export default function PoolContainer() {
                 handleLoading(constants.SELECTED_FIGHTERS_INDEX, false);
                 return response.data.defaultPool.fighters;
             } else {
-                handleError(constants.SELECTED_FIGHTERS_INDEX, 'Unable to load Fighters');
+                setError('Unable to load the fighters');
             }
             return [];
         } catch (error) {
-            console.log(error);
+            setError(`Unable to load the fighters`);
         }
     }
 
@@ -217,9 +218,11 @@ export default function PoolContainer() {
                 setFighters([...fighters]);
                 setLoadedFighters([...fighters]);
                 setSelectedFighters([]);
+            } else {
+                setError(`Unable to the fighters`);
             }
         } catch (error) {
-            console.log(error);
+            setError(`Unable to the fighters`);
         }
     }
 
@@ -337,17 +340,15 @@ export default function PoolContainer() {
     const deletePool = async () => {
         const id = pools[poolIndex]._id;
         try {
-            const response = await axios.delete(`${constants.BASE_URL}/defaultPool/${id}`, {
-                headers: {
-                    Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZTA1NGEyYWUzNjkyNDQ0NDA4NjJmMWMiLCJpYXQiOjE1Nzc4OTc3NzJ9.f-lOe5ER2sSUBzLez6rZHb0vEZcGMSV9jdUEY_-H0m0'
-                }
-            });
+            const response = await axios.delete(`${constants.BASE_URL}/defaultPool/${id}`);
             if (response.data.success) {
                 loadPools();
                 setPoolIndex(0);
+            } else {
+                setError(`Unable to delete the pool`);
             }
         } catch (error) {
-            console.log(error);
+            setError(`Unable to delete the pool`);
         }
     }
 
@@ -358,14 +359,11 @@ export default function PoolContainer() {
         }
         handleLoading(constants.CREATE_POOL_SAVE_CHANGES_INDEX, true);
         try {
+            console.log(updateMode);
             let response = null;
             if (updateMode) {
-                poolObject = {fighters: [...selectedFighters]};
-                response = await axios.patch(`/defaultPool/${pools[poolIndex]._id}`, { ...poolObject }, {
-                    headers: {
-                        Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZTA1NGEyYWUzNjkyNDQ0NDA4NjJmMWMiLCJpYXQiOjE1Nzc4OTc3NzJ9.f-lOe5ER2sSUBzLez6rZHb0vEZcGMSV9jdUEY_-H0m0'
-                    }
-                });
+                poolObject = { fighters: [...selectedFighters] };
+                response = await axios.patch(`/defaultPool/${pools[poolIndex]._id}`, { ...poolObject });
                 if (response.data.defaultPool) {
                     handleLoading(constants.CREATE_POOL_SAVE_CHANGES_INDEX, false);
                     setSuccess(true);
@@ -373,13 +371,9 @@ export default function PoolContainer() {
                         setSuccess(false);
                     }, 3000);
                 }
-            }
-            if (!updateMode) {
-                response = await axios.post('/defaultPool', { ...poolObject }, {
-                    headers: {
-                        Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZTA1NGEyYWUzNjkyNDQ0NDA4NjJmMWMiLCJpYXQiOjE1Nzc4OTc3NzJ9.f-lOe5ER2sSUBzLez6rZHb0vEZcGMSV9jdUEY_-H0m0'
-                    }
-                })
+            } else {
+                response = await axios.post('/defaultPool', { ...poolObject })
+                console.log(response);
                 if (response.data.defaultPool) {
                     handleLoading(constants.CREATE_POOL_SAVE_CHANGES_INDEX, false);
                     setSuccess(true);
@@ -390,7 +384,7 @@ export default function PoolContainer() {
             }
         } catch (error) {
             handleLoading(constants.CREATE_POOL_SAVE_CHANGES_INDEX, false);
-            console.log(error);
+            setError(`Unable to ${updateMode ? 'update' : 'save'} the pool`);
         }
     }
 
@@ -403,17 +397,6 @@ export default function PoolContainer() {
 
     const handleUpdateChange = (event) => {
         setUpdateMode(event.target.checked);
-    }
-
-    const handleError = (index, message) => {
-        let errors = error;
-        if (message !== '') {
-            errors[index].message = message;
-            errors[index].occurs = true;
-        } else {
-            errors[index].occurs = false;
-        }
-        setError([...errors]);
     }
 
     const values = {
@@ -538,7 +521,7 @@ export default function PoolContainer() {
     const UpdateFighters = () => {
         return <><FormGroup>
             {
-                <FormControl>
+                pools && pools.length > 0 && <FormControl>
                     <FormControlLabel
                         control={
                             <Checkbox checked={updateMode} onChange={(event) => handleUpdateChange(event)} value="checkedA" />
@@ -549,13 +532,39 @@ export default function PoolContainer() {
             }
         </FormGroup>
             {
-                updateMode && pools && <PoolSelection deletePool={deletePool} pools={pools} poolIndex={poolIndex} handlePoolIndex={setPoolIndex}/>
+                updateMode && pools && <PoolSelection loadFightersFlag deletePool={deletePool} pools={pools} poolIndex={poolIndex} handlePoolIndex={setPoolIndex} />
             }
         </>
     }
-    
+
+    const handleClose = () => {
+        setError(false);
+    }
+
+    const [{ hovered }, dropRef] = useDrop({
+        accept: 'CARD',
+        drop(item, monitor) {
+            if(item.from !== 'fighters'){
+                let allSelected = [...selectedFighters];
+                let removedFighter = allSelected.splice(item.index, 1);
+                let allFighters = [...fighters];
+                allFighters.splice(0,0,removedFighter[0]);
+                setFighters([...allFighters]);
+                setSelectedFighters(...[allSelected]);
+            }
+        },
+        collect: monitor => {
+            return {
+                hovered: monitor.isOver()
+            }
+        }
+    });
+
     return <PoolContext.Provider value={{ ...values }}>
-        <Container style={{ marginTop: '40px' }}>
+        {
+            error && <CustomMessage handleClose={handleClose} open={error ? true : false} type="error" message={error} />
+        }
+        <Container ref={dropRef} style={{ marginTop: '40px', width: '100%' }} className={clsx({[classes.hovered]: hovered})}>
             <Grid container>
                 <Grid item md={5} style={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
