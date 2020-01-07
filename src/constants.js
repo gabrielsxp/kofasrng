@@ -11,7 +11,7 @@ export default {
     SIGN_IN: '/signin',
     SIGN_UP: '/signup',
     TOPPULLS: '/top',
-    DEFAULT_POOL_ID: '5e0f3c6bf04a0b39c8afe67b',
+    DEFAULT_POOL_ID: '5e14a00f6a9c8e4d2034486d',
     CREATE_POOL: `/pool`,
     FIGHTERS_REQUEST: '/fighters',
     FIGHTERS_INDEX: 0,

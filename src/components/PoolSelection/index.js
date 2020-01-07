@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import clsx from 'clsx';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import BootstrapInput from '../BootstrapInput/index';

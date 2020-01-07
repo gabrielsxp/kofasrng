@@ -1,6 +1,10 @@
+import moment from 'moment';
+
 const initialState = {
     user: null,
     currentDashboardItem: 0,
+    fromDate: moment(),
+    toDate: moment()
 }
 
 const reducer = (state = { ...initialState }, action) => {
@@ -12,14 +16,24 @@ const reducer = (state = { ...initialState }, action) => {
             }
         }
         case 'CURRENT_DASHBOARD_ITEM': {
-            console.log(action.item);   
             return {
                 ...state,
                 currentDashboardItem: action.item
             }
         }
+        case 'BANNER_START_DATE': {
+            return {
+                ...state,
+                fromDate: moment(action.fromDate)
+            }
+        }
+        case 'BANNER_END_DATE': {
+            return {
+                ...state,
+                toDate: moment(action.toDate)
+            }
+        }
         default:
-            console.log('wrong');
             return {
                 ...state
             }

@@ -10,11 +10,8 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import FormControl from '@material-ui/core/FormControl';
 import CustomMessage from '../CustomMessage/index';
 import { FaKey } from 'react-icons/fa';
-import { login, setCurrentUser } from '../../services/Auth';
 import { withRouter } from 'react-router-dom';
 import constants from '../../constants';
-import {getCurrentUser} from '../../services/Auth';
-import {useDispatch} from 'react-redux';
 import axios from '../../axios';
 
 const useStyles = makeStyles(theme => createStyles({
