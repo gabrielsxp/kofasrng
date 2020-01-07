@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import clsx from 'clsx';
 import './style.css';
 import { makeStyles } from '@material-ui/core/styles';
@@ -16,7 +16,7 @@ import { Link } from 'react-router-dom';
 import { useLocation } from 'react-router';
 import constants from '../../constants';
 import logo from '../../images/logo.png';
-import {logout, getCurrentUser, removeCurrentUser } from '../../services/Auth/index';
+import {logout, removeCurrentUser } from '../../services/Auth/index';
 import { useSelector, useDispatch } from 'react-redux';
 
 const useStyles = makeStyles(theme => ({

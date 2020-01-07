@@ -1,11 +1,8 @@
 import React, { useContext } from 'react';
 import PoolContext from '../PoolContainer/context';
 import FormControl from '@material-ui/core/FormControl';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Typography from '@material-ui/core/Typography';
-import Checkbox from '@material-ui/core/Checkbox';
 import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import DraggableFighter from '../DraggableFighter/index';
 import DropFighterList from '../DropFighterList/index';

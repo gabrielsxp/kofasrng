@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import moment from 'moment';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -19,9 +20,11 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Loading from '../Loading/index';
 import axios from '../../axios';
 import constants from '../../constants';
+import DatePicker from '../DatePicker/index';
 import { getCurrentUser } from '../../services/Auth/index';
 import PoolSelection from '../PoolSelection';
 import CustomMessage from '../CustomMessage/index';
+import { useSelector, useDispatch } from 'react-redux';
 
 const useStyles = makeStyles(theme => ({
     title: {
@@ -103,7 +106,6 @@ export default function BannerContainer() {
     const [updateIndex, setUpdateIndex] = useState(0);
     const [poolIndex, setPoolIndex] = useState(0);
     const [updateMode, setUpdateMode] = useState(false);
-    const [deleteMode, setDeleteMode] = useState(false);
     const [hasFes, setHasFes] = useState(false);
     const [hasAS, setHasAS] = useState(false);
     const [fesFighters, setFesFighters] = useState([]);
@@ -121,6 +123,9 @@ export default function BannerContainer() {
     const [ASMaxRates, setASMaxRates] = useState(0);
     const baseCosts = [{ name: 'Single Summon', value: 100 }, { name: 'Multi Summons', value: 900 }];
     const [costs, setCosts] = useState([...baseCosts]);
+    const from = useSelector(state => state.fromDate);
+    const to = useSelector(state => state.toDate);
+    const dispatch = useDispatch();
 
     const loadBanners = async () => {
         try {
@@ -139,13 +144,11 @@ export default function BannerContainer() {
         }
     }
 
-
     const loadPools = async () => {
         try {
             setLoading(true);
             setLoadPools(true);
             const response = await axios.get(`${constants.BASE_URL}/defaultPool`);
-            console.log(response);
             var pools = response.data.defaultPools;
             if (pools.length > 0) {
                 setPools([...pools]);
@@ -156,21 +159,25 @@ export default function BannerContainer() {
                 const ASFighters = fighters.filter(fighter => fighter.isAS && !fighter.isFes);
                 const hasFes = fesFighters.length > 0;
                 const hasAS = ASFighters.length > 0;
-                let dist = rates.value[rates.value.length - 1] - rates.value[rates.value.length - 2];
-                if (hasFes) {
-                    let fesRates = fesFighters.map((_, index) => (dist * (index)) / (fesFighters.length));
-                    setFesRates([...fesRates]);
+                if (!updateMode) {
+                    let dist = rates.value[rates.value.length - 1] - rates.value[rates.value.length - 2];
+                    if (hasFes) {
+                        let fesRates = fesFighters.map((_, index) => (dist * (index)) / (fesFighters.length));
+                        setFesRates([...fesRates]);
+                    }
+                    if (hasAS) {
+                        let ASRates = ASFighters.map((_, index) => (dist * (index)) / (ASFighters.length))
+                        setASRates([...ASRates]);
+                    }
+                    setFesMaxRates(dist);
+                    setASMaxRates(dist);
                 }
-                if (hasAS) {
-                    let ASRates = ASFighters.map((_, index) => (dist * (index)) / (ASFighters.length))
-                    setASRates([...ASRates]);
-                }
+
                 setFesFighters([...fesFighters]);
                 setASFighters([...ASFighters]);
                 setHasFes(hasFes);
                 setHasAS(hasAS);
-                setFesMaxRates(dist);
-                setASMaxRates(dist);
+
                 setLoading(false);
             } else {
                 setLoading(false);
@@ -189,6 +196,7 @@ export default function BannerContainer() {
             if (response.data.success) {
                 let b = loadBanners();
                 setBanners([...b]);
+                setUpdateIndex(0);
             }
         } catch (error) {
             console.log(error);
@@ -205,28 +213,30 @@ export default function BannerContainer() {
         let poolIndex = pools.findIndex((p) => p._id === banner.pool);
         let image = banner.image;
         let rates = { value: banner.rates, min: 0, max: 99 };
-        let fesRates = banner.fesRates.map(r => r.rate);
+        let fesRates = banner.fesRates.map(f => f.rate);
+        let asRates = banner.asRates.map(f => f.rate);
         let hasFes = fesRates.length > 0;
-        let asRates = banner.asRates.map(r => r.rate);
-        let hasAS = asRates.length > 0;
+        let hasAS = fesRates.length > 0;
+        let start = banner.start;
+        let end = banner.end;
 
         setName(name);
         setCosts([...costs]);
         setPoolIndex(poolIndex !== -1 ? poolIndex : 0);
         setImage(image);
         setRates({ ...rates });
-        setHasFes(hasFes);
-        if (hasFes) {
-            let max = fesRates[fesRates.length - 1] !== fesRates[fesRates.length - 2] ? fesRates[fesRates.length - 1] - fesRates[fesRates.length - 2]
-                : fesRates[fesRates.length - 1] - fesRates[fesRates.length - 2];
+        dispatch({ type: 'BANNER_START_DATE', fromDate: start });
+        dispatch({ type: 'BANNER_END_DATE', toDate: end });
+
+        let ratesLength= banner.rates.length;
+        let max = banner.rates[ratesLength-1] - banner.rates[ratesLength-2];
+        if(hasFes){    
+            setFesRates([...fesRates]);
             setFesMaxRates(max);
-            console.log(fesRates);
-            setFesRates([0, 6]);
         }
-        setHasAS(asRates);
-        if (hasAS) {
-            //setASMaxRates([...asRates]);
+        if(hasAS){
             setASRates([...asRates]);
+            setASMaxRates(max);
         }
     }
 
@@ -262,28 +272,30 @@ export default function BannerContainer() {
             multiCost: costs[1].value,
             pool: pools[poolIndex],
             rates: rates.value,
+            start: moment(from).toISOString(),
+            end: moment(to).toISOString(),
             fesRates: [...fesFinalRates],
             asRates: [...asFinalRates]
         }
         if (updateMode) {
             try {
-                const response = await axios.patch(`${constants.BASE_URL}/banner/${banners[updateIndex]._id}`, {...finalObject})
-                if(response.data.banner){
+                const response = await axios.patch(`${constants.BASE_URL}/banner/${banners[updateIndex]._id}`, { ...finalObject })
+                if (response.data.banner) {
                     setSuccess(true);
-                    loadBanners();
+                    setUpdateMode(false);
                     setTimeout(() => {
                         setSuccess(false);
                     }, 3000);
                 } else {
                     setError(response.data.error);
                 }
-            } catch(error){
+            } catch (error) {
                 setError('Unable to update the banner');
             }
         } else {
             try {
-                const response = await axios.post(`${constants.BASE_URL}/banner`, {...finalObject});
-                if(response.data.banner){
+                const response = await axios.post(`${constants.BASE_URL}/banner`, { ...finalObject });
+                if (response.data.banner) {
                     setSuccess(true);
                     setTimeout(() => {
                         setSuccess(false);
@@ -377,14 +389,16 @@ export default function BannerContainer() {
                     <Grid item xs={12} md={6} className={classes.grid}>
                         <FormGroup>
                             <Typography required className={classes.title} variant="h5">Banner Management</Typography>
-                            <FormControl style={{ marginTop: '10px' }}>
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox checked={updateMode} onChange={(event) => handleChangeUpdateMode(event)} value="checkedA" />
-                                    }
-                                    label="Update Existing Banner ?"
-                                />
-                            </FormControl>
+                            {
+                                banners && banners.length > 0 && <FormControl style={{ marginTop: '10px' }}>
+                                    <FormControlLabel
+                                        control={
+                                            <Checkbox checked={updateMode} onChange={(event) => handleChangeUpdateMode(event)} value="checkedA" />
+                                        }
+                                        label="Update Existing Banner ?"
+                                    />
+                                </FormControl>
+                            }
                             <FormControl>
                                 {
 
@@ -402,6 +416,14 @@ export default function BannerContainer() {
                                     </FormControl>
                                 })
                             }
+                            <FormControl className={classes.space}>
+                                {
+                                    user && user.role === 1 && <>
+                                        <DatePicker type="from" className={classes.space} />
+                                        <DatePicker type="to" />
+                                    </>
+                                }
+                            </FormControl>
                             <FormControl className={classes.space}>
                                 {
                                     pools && <>
@@ -423,7 +445,7 @@ export default function BannerContainer() {
                                 }
                             </FormControl>
                             <FormControl className={classes.space}>
-                                <TextField size="small" style={{ margin: '15px 0' }} id="image-anchor-field" label="Image Link" variant="outlined" onChange={(event) => handleImageChange(event)} value={image} />
+                                <TextField required size="small" style={{ margin: '15px 0' }} id="image-anchor-field" label="Image Link" variant="outlined" onChange={(event) => handleImageChange(event)} value={image} />
                             </FormControl>
                             <FormControl>
                                 <Typography variant="h6" style={{ marginBottom: '20px' }}>Set Fighter Rates</Typography>
@@ -597,7 +619,7 @@ export default function BannerContainer() {
                                 name.length < 6 ||
                                 (costs[0].value === '' && costs[1].value === '')
                             }
-                        onClick={() => saveChanges()} style={{ marginRight: '20px' }} color="primary" variant="contained">{success ? 'OK' : 'Save Changes'}</Button>
+                            onClick={() => saveChanges()} style={{ marginRight: '20px' }} color="primary" variant="contained">{success ? 'OK' : 'Save Changes'}</Button>
                         <Button variant="outlined" color="secondary" onClick={() => resetInputs()}>Reset</Button>
                     </Grid>
                 </Grid>
