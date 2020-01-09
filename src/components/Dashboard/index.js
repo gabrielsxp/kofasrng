@@ -16,6 +16,11 @@ const BannerContainer = Loadable({
     loading: Loading
 });
 
+const AccountOverview = Loadable({
+    loader: () => import('../AccountOverview/index'),
+    loading: Loading
+});
+
 const ChangePassword = Loadable({
     loader: () => import('../ChangePassword/index'),
     loading: Loading
@@ -41,10 +46,11 @@ export default function Dashboard() {
     return <DashboardContext.Provider value={{ ...values }}>
         <Container className={classes.root} >
             {
-                currentItem === 0 ? <BannerContainer /> :
-                    currentItem === 1 ? <PoolContainer /> :
-                        currentItem === 2 ? <ChangePassword /> :
-                        null
+                currentItem === 0 ? <AccountOverview /> :
+                    currentItem === 1 ? <BannerContainer /> :
+                        currentItem === 2 ? <PoolContainer /> :
+                            currentItem === 3 ? <ChangePassword /> :
+                                null
             }
         </Container>
         <DashboardSidebar />

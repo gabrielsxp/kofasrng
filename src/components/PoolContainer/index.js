@@ -27,7 +27,8 @@ const useStyles = makeStyles(theme => ({
         borderRadius: '5px'
     },
     section: {
-        padding: '80px 0'
+        padding: `${theme.spacing(2)}px 0`,
+        marginBottom: theme.spacing(2)
     },
     grid: {
         padding: theme.spacing(2)
@@ -564,7 +565,7 @@ export default function PoolContainer() {
         {
             error && <CustomMessage handleClose={handleClose} open={error ? true : false} type="error" message={error} />
         }
-        <Container ref={dropRef} style={{ marginTop: '40px', width: '100%' }} className={clsx({[classes.hovered]: hovered})}>
+        <Container ref={dropRef} className={clsx({[classes.hovered]: hovered}, classes.section)}>
             <Grid container>
                 <Grid item md={5} style={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
