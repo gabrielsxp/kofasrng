@@ -388,7 +388,7 @@ export default function BannerContainer() {
                 <Grid container>
                     <Grid item xs={12} md={6} className={classes.grid}>
                         <FormGroup>
-                            <Typography required className={classes.title} variant="h5">Banner Management</Typography>
+                            <Typography className={classes.title} variant="h5">Banner Management</Typography>
                             {
                                 banners && banners.length > 0 && <FormControl style={{ marginTop: '10px' }}>
                                     <FormControlLabel

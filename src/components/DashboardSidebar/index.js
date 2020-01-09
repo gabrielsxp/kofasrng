@@ -10,6 +10,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import { FaUsers } from 'react-icons/fa';
+import { FaChartLine } from 'react-icons/fa';
 import { FaKey } from 'react-icons/fa';
 import { GiCutDiamond } from 'react-icons/gi';
 
@@ -66,6 +67,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const items = [
+    { name: 'Stats Overview', icon: FaChartLine },
     { name: 'Create Banner', icon: GiCutDiamond },
     { name: 'Create Default Pool', icon: FaUsers }
 ];
