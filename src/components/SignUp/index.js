@@ -148,7 +148,8 @@ function SignUp({ history }) {
 
         history.push(`${constants.ADMIN}`);
       } else {
-        handleError(response.data.message);
+        handleError(response.data.error);
+        setLoading(false);
       }
     } catch (error) {
       handleError('Unable to create an account right now !');

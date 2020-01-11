@@ -1,10 +1,10 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import Routes from './components/Routes/index';
 import { DndProvider } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import TouchBackend from 'react-dnd-touch-backend';
 import MultiBackend, { TouchTransition } from 'react-dnd-multi-backend';
-import {getCurrentUser, setCurrentUser} from './services/Auth';
+import { getCurrentUser, setCurrentUser } from './services/Auth';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { useDispatch } from 'react-redux';
 
@@ -22,15 +22,15 @@ const HTML5toTouch = {
   ]
 };
 
-function App() {
+function App(props) {
   const dispatch = useDispatch();
   useEffect(() => {
     try {
       const user = getCurrentUser();
-      dispatch({type: 'AUTHENTICATED_USER', user});
-    } catch(error){
+      dispatch({ type: 'AUTHENTICATED_USER', user });
+    } catch (error) {
       setCurrentUser('user', null);
-      dispatch({type: 'AUTHENTICATED_USER', user: null});
+      dispatch({ type: 'AUTHENTICATED_USER', user: null });
     }
   }, []);
   return (

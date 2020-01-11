@@ -24,10 +24,13 @@ const useStyles = makeStyles(theme => ({
         height: '80px',
         boxSizing: 'border-box',
         cursor: 'pointer'
+    },
+    filter: {
+        filter:'grayscale(90%)'
     }
 }));
 
-export default function FighterCard({ fighter, display, flipped  }) {
+export default function FighterCard({ fighter, display, flipped, notCollected  }) {
     const classes = useStyles();
 
     return fighter && <>
@@ -38,7 +41,7 @@ export default function FighterCard({ fighter, display, flipped  }) {
             flipped ? (fighter.rarity === 'Gold' && fighter.isFes ? 'fighter-box-fes' : 
             fighter.rarity === 'Gold' && !fighter.isFes ? 'fighter-box-gold' : null) : null)}>
         <div className={display ? 'content flip' : 'content'}>
-            <div className="back" style={{
+            <div className={clsx("back", {[classes.filter]: notCollected})} style={{
         backgroundImage: `url(${constants.FIGHTER_URL + fighter.year + '/' + fighter.image})`,
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'contain',

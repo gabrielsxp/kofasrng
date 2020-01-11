@@ -12,7 +12,7 @@ const useStyles = makeStyles(theme => ({
         overflow: 'hidden',
         overflowY: 'scroll',
         boxSizing: 'borderBox',
-        minHeight: '50px',
+        minHeight: '100px',
         maxHeight: '300px',
         [theme.breakpoints.down('md')]: {
             maxHeight: '200px',

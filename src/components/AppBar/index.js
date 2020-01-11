@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import './style.css';
 import { makeStyles } from '@material-ui/core/styles';
@@ -14,9 +14,10 @@ import MenuIcon from '@material-ui/icons/Menu';
 import Logo from '../Logo/index';
 import { Link } from 'react-router-dom';
 import { useLocation } from 'react-router';
+import { useHistory } from 'react-router-dom';
 import constants from '../../constants';
 import logo from '../../images/logo.png';
-import {logout, removeCurrentUser } from '../../services/Auth/index';
+import { logout, removeCurrentUser } from '../../services/Auth/index';
 import { useSelector, useDispatch } from 'react-redux';
 
 const useStyles = makeStyles(theme => ({
@@ -46,7 +47,7 @@ const useStyles = makeStyles(theme => ({
         borderBottom: '3px solid #fff'
     },
     appBarItemMobile: {
-        color: `#BDBDBD`,
+        color: theme.palette.secondary.main,
         textDecoration: 'none',
         marginLeft: '5px'
     },
@@ -93,13 +94,13 @@ const useStyles = makeStyles(theme => ({
 
 const appBarLinks = [
     { title: 'Home', link: constants.HOME },
-    { title: 'Summon', link: constants.SUMMON },
-    { title: 'Top', link: constants.TOPPULLS }
+    { title: 'Banners', link: constants.BANNERS },
+    { title: 'Stats', link: constants.STATS }
 ];
 
 const AppBarItem = ({ linkTo, title, onClick }) => {
     let location = useLocation();
-    let thisLocation = title.toLowerCase(title);
+    let thisLocation = title.toLowerCase();
 
     const classes = useStyles();
     return <div onClick={onClick} key={title} className={clsx(classes.itemContainer, location.pathname.includes(thisLocation) ? classes.active : '')}>
@@ -109,7 +110,7 @@ const AppBarItem = ({ linkTo, title, onClick }) => {
     </div>
 }
 
-const DesktopSection = ({user, signOut}) => {
+const DesktopSection = ({ user, signOut }) => {
     const classes = useStyles();
 
     return <div className={classes.desktopSection}>
@@ -120,12 +121,12 @@ const DesktopSection = ({user, signOut}) => {
         }
         {
             user !== null ? <>
-                <AppBarItem linkTo={constants.ADMIN} title="Panel" />
+                <AppBarItem linkTo={constants.ADMIN} title="Dashboard" />
                 <AppBarItem onClick={() => signOut()} title="Sign Out" />
             </> :
-            <>
-                <AppBarItem linkTo={`${constants.SIGN_IN}`} title={"Sign In"} />
-            </>
+                <>
+                    <AppBarItem linkTo={`${constants.SIGN_IN}`} title={"Sign In"} />
+                </>
         }
     </div>
 }
@@ -134,6 +135,7 @@ export default function MainAppBar() {
     const classes = useStyles();
     let location = useLocation();
     let thisLocation = location.pathname;
+    let history = useHistory();
 
     const [openMobileMenu, setOpenMobileMenu] = useState(false);
     const user = useSelector(state => state.user);
@@ -143,27 +145,39 @@ export default function MainAppBar() {
         setOpenMobileMenu(!openMobileMenu);
     }
 
-    const MobileItem = ({ linkTo, title }) => {
+    const closeMobileMenu = () => {
+        setOpenMobileMenu(false);
+    }
+
+    const MobileItem = ({ linkTo, title, onClick }) => {
         let location = useLocation();
         var thisLocation = title ? `/` + (title === 'Home' ? '' : title.toLowerCase(title)) : null;
         console.log(location.pathname, thisLocation);
 
-        return <ListItem button key={title} className={location.pathname === thisLocation ? classes.activeAppBarItemMobile : null}>
-            <Link to={linkTo} className={classes.appBarItemMobile}>
-                <ListItemText className={location.pathname === thisLocation ? classes.activeAppBarItemMobileText : null}>
-                    {title}
-                </ListItemText>
-            </Link>
+        return <Link onClick={onClick} to={linkTo} className={classes.appBarItemMobile}><ListItem button key={title} className={location.pathname === thisLocation ? classes.activeAppBarItemMobile : null}>
+            <ListItemText className={location.pathname === thisLocation ? classes.activeAppBarItemMobileText : null}>
+                {title}
+            </ListItemText>
         </ListItem>
+        </Link>
     }
 
-    const SideList = () => {
+    const SideList = ({ user, signOut }) => {
         return <div className={classes.list}>
             <List>
                 {
                     appBarLinks ? appBarLinks.map((item, index) => {
-                        return <MobileItem linkTo={item.link} title={item.title} key={index} />
+                        return <MobileItem onClick={() => closeMobileMenu()} linkTo={item.link} title={item.title} key={index} />
                     }) : null
+                }
+                {
+                    user !== null ? <>
+                        <MobileItem onClick={() => closeMobileMenu()} linkTo={constants.ADMIN} title="Dashboard" />
+                        <MobileItem onClick={() => signOut()} title="Sign Out" />
+                    </> :
+                        <>
+                            <MobileItem linkTo={`${constants.SIGN_IN}`} title={"Sign In"} />
+                        </>
                 }
             </List>
         </div>
@@ -171,9 +185,16 @@ export default function MainAppBar() {
 
     const signOut = () => {
         logout();
+        closeMobileMenu();
         removeCurrentUser();
-        dispatch({type: 'AUTHENTICATED_USER', user: null});
+        dispatch({ type: 'AUTHENTICATED_USER', user: null });
     }
+
+    useEffect(() => {
+        if (location.pathname === '/') {
+            history.push(constants.HOME);
+        }
+    }, []);
 
     return (
         <div className={classes.root}>
@@ -186,7 +207,7 @@ export default function MainAppBar() {
                     </div>
                     <DesktopSection user={user} signOut={signOut} />
                     <Drawer anchor="right" open={openMobileMenu} onClose={() => toggleMenu()}>
-                        <SideList />
+                        <SideList user={user} signOut={signOut} />
                     </Drawer>
                     <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu" onClick={() => toggleMenu()}>
                         <MenuIcon />

@@ -27,7 +27,7 @@ const useStyles = makeStyles(theme => ({
         width: '100%'
     },
     subTitle: {
-        margin: `${theme.spacing(2)}px 0`,
+        margin: `10px 0`,
         textAlign: 'right',
         [theme.breakpoints.down('md')]:{
             textAlign: 'left'

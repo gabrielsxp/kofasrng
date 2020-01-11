@@ -24,7 +24,12 @@ const AccountOverview = Loadable({
 const ChangePassword = Loadable({
     loader: () => import('../ChangePassword/index'),
     loading: Loading
-})
+});
+
+const FighterCollection = Loadable({
+    loader: () => import('../FighterCollection'),
+    loading: Loading
+});
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -47,10 +52,11 @@ export default function Dashboard() {
         <Container className={classes.root} >
             {
                 currentItem === 0 ? <AccountOverview /> :
-                    currentItem === 1 ? <BannerContainer /> :
-                        currentItem === 2 ? <PoolContainer /> :
-                            currentItem === 3 ? <ChangePassword /> :
-                                null
+                    currentItem === 1 ? <FighterCollection /> :
+                        currentItem === 2 ? <BannerContainer /> :
+                            currentItem === 3 ? <PoolContainer /> :
+                                currentItem === 4 ? <ChangePassword /> :
+                                    null
             }
         </Container>
         <DashboardSidebar />
