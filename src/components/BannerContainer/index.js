@@ -625,7 +625,7 @@ export default function BannerContainer() {
                 </Grid>
             </Container>
                 : !loadPool && <Container style={{ padding: '80px 20px' }}>
-                    <Typography variant="h5" style={{ marginBottom: '20px' }}>You do not have any pools yet</Typography>
+                    <Typography style={{ marginBottom: '20px' }}>You do not have any pools yet</Typography>
                 </Container>
         }
         {loadPool && <Loading />}

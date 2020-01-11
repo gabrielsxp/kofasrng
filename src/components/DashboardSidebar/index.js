@@ -12,6 +12,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import { FaUsers } from 'react-icons/fa';
 import { FaChartLine } from 'react-icons/fa';
 import { FaKey } from 'react-icons/fa';
+import { GiRevolt } from 'react-icons/gi';
 import { GiCutDiamond } from 'react-icons/gi';
 
 const drawerWidth = 240;
@@ -71,8 +72,9 @@ const useStyles = makeStyles(theme => ({
 
 const items = [
     { name: 'Stats Overview', icon: FaChartLine },
+    { name: 'Fighters Collection', icon: FaUsers },
     { name: 'Create Banner', icon: GiCutDiamond },
-    { name: 'Create Default Pool', icon: FaUsers }
+    { name: 'Create Default Pool', icon: GiRevolt }
 ];
 
 export default function DashboardSidebar() {

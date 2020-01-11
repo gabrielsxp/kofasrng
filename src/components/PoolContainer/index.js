@@ -17,6 +17,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import green from '@material-ui/core/colors/green';
 import axios from '../../axios';
+import FilterFighters from '../FilterFighters/index';
 import constants from '../../constants';
 
 const useStyles = makeStyles(theme => ({
@@ -31,7 +32,7 @@ const useStyles = makeStyles(theme => ({
         marginBottom: theme.spacing(2)
     },
     grid: {
-        padding: theme.spacing(2)
+        padding: '20px'
     },
     alignForm: {
         display: 'flex',
@@ -75,12 +76,12 @@ function difference(selected) {
     }
 }
 
+
 export default function PoolContainer() {
     const classes = useStyles();
     const [fighters, setFighters] = useState([]);
     const [loadedFighters, setLoadedFighters] = useState([]);
     const [selectedFighters, setSelectedFighters] = useState([]);
-    const [loadedSelectedFighters, setLoadedSelectedFighters] = useState([]);
     const [loading, setLoading] = useState([
         false,
         false,
@@ -89,23 +90,7 @@ export default function PoolContainer() {
     const [error, setError] = useState(false);
     const [poolName, setPoolName] = useState('');
     const [useDefaultPool, setUseDefaultPool] = useState(true);
-    const [colors, setFightersColors] = useState([
-        { name: 'purple', url: constants.PURPLE_URL, checked: true },
-        { name: 'blue', url: constants.BLUE_URL, checked: true },
-        { name: 'red', url: constants.RED_URL, checked: true },
-        { name: 'green', url: constants.GREEN_URL, checked: true },
-        { name: 'yellow', url: constants.YELLOW_URL, checked: true }
-    ]);
-    const [types, setTypes] = useState([
-        { name: 'attack', url: constants.ATTACK_URL, checked: true },
-        { name: 'defense', url: constants.DEFENSE_URL, checked: true },
-        { name: 'tech', url: constants.TECH_URL, checked: true }
-    ]);
-    const [rarities, setRarities] = useState([
-        { name: 'Gold', url: constants.GOLD_URL, checked: true },
-        { name: 'Silver', url: constants.SILVER_URL, checked: true },
-        { name: 'Bronze', url: constants.BRONZE_URL, checked: true }
-    ]);
+    
     const [otherChecks, setOtherChecks] = useState([
         { name: 'FES Fighter', checked: false },
         { name: 'All Star', checked: false }
@@ -137,30 +122,6 @@ export default function PoolContainer() {
         setUseDefaultPool(event.target.checked);
     }
 
-    const handleFightersColorChange = (event, index) => {
-        let colorsCopy = colors;
-        colorsCopy[index].checked = event.target.checked;
-        setFightersColors([...colorsCopy]);
-
-        setFighters([...searchByColor()]);
-    }
-
-    const handleFightersRaritiesChange = (event, index) => {
-        let raritiesCopy = rarities;
-        raritiesCopy[index].checked = event.target.checked;
-        setRarities([...raritiesCopy]);
-
-        setFighters([...searchByRarity()]);
-    }
-
-    const handleFightersTypeChange = (event, index) => {
-        let typesCopy = types;
-        typesCopy[index].checked = event.target.checked;
-        setTypes([...typesCopy]);
-
-        setFighters([...searchByType()]);
-    }
-
     const handleOtherChecksChange = (event, index) => {
         let checks = otherChecks;
         otherChecks[index].checked = event.target.checked;
@@ -190,15 +151,6 @@ export default function PoolContainer() {
         }
     }
 
-    const resetFighters = () => {
-        resetColors();
-        resetTypes();
-        resetRarities();
-        resetOtherChecks();
-        setFighters([...loadedFighters]);
-        setSelectedFighters([...loadedSelectedFighters]);
-    }
-
     const loadAllFighters = async (useDefaultPool) => {
         try {
             handleLoading(constants.FIGHTERS_INDEX, true);
@@ -213,7 +165,6 @@ export default function PoolContainer() {
                     setFighters([...fighters]);
                     setLoadedFighters([...fighters]);
                     setSelectedFighters([...selected]);
-                    setLoadedSelectedFighters([...selected]);
                     return;
                 }
                 setFighters([...fighters]);
@@ -227,41 +178,9 @@ export default function PoolContainer() {
         }
     }
 
-    const searchByColor = () => {
-        let fightersCopy = loadedFighters;
-        const c = colors.filter(color => color.checked).map(res => res.name);
-        let result = fightersCopy.filter((f) => {
-            return c.includes(f.color)
-        })
-
-        return result;
-    }
-
-    const searchByType = () => {
-        let fightersCopy = loadedFighters;
-        const t = types.filter(type => type.checked).map(res => res.name);
-        let result = fightersCopy.filter((f) => {
-            return t.includes(f.type)
-        })
-        return result;
-    }
-
-    const searchByRarity = () => {
-        let fightersCopy = loadedFighters;
-        const t = rarities.filter(rarity => rarity.checked).map(res => res.name);
-        let result = fightersCopy.filter((f) => {
-            return t.includes(f.rarity)
-        })
-
-        return result;
-    }
-
     const searchFES = () => {
         let fightersCopy = fighters;
         const c = otherChecks.filter(check => check.checked).map(res => res.name);
-        if (c.length === 0) {
-            return fightersCopy;
-        }
         let fesResult = fightersCopy.filter(f => c.includes(f.isFes ? 'FES Fighter' : null));
 
         return fesResult;
@@ -312,30 +231,6 @@ export default function PoolContainer() {
 
             return;
         }
-    }
-
-    const resetColors = () => {
-        const c = colors;
-        c.forEach(color => color.checked = true);
-        setFightersColors([...c]);
-    }
-
-    const resetTypes = () => {
-        const t = types;
-        t.forEach(type => type.checked = true);
-        setTypes([...t]);
-    }
-
-    const resetRarities = () => {
-        const r = rarities;
-        r.forEach(rarity => rarity.checked = true);
-        setRarities([...r]);
-    }
-
-    const resetOtherChecks = () => {
-        const c = otherChecks;
-        c.forEach(check => check.checked = false);
-        setOtherChecks([...c]);
     }
 
     const deletePool = async () => {
@@ -412,24 +307,6 @@ export default function PoolContainer() {
         difference,
     };
 
-    const resetFilters = () => {
-        resetRarities();
-        resetTypes();
-        resetColors();
-        resetOtherChecks();
-    }
-
-    const moveSelection = () => {
-        let selected = selectedFighters;
-        const selection = fighters;
-        selected = selected.concat(selection);
-        let diff = loadedFighters.filter(difference(selection));
-        setFighters([...diff]);
-        setLoadedFighters([...diff]);
-        setSelectedFighters([...selected]);
-        resetFilters();
-    }
-
     useEffect(() => {
         loadAllFighters(useDefaultPool);
     }, [useDefaultPool]);
@@ -441,83 +318,7 @@ export default function PoolContainer() {
     let condition = selectedFighters.some(fighter => fighter.rarity === 'Bronze') &&
         selectedFighters.some(fighter => fighter.rarity === 'Silver') &&
         selectedFighters.some(fighter => fighter.rarity === 'Gold');
-    const FilterFighters = () => {
-        return <form action="" noValidate>
-            <FormGroup>
-                {
-                    <FormControl style={{ marginTop: '10px' }}>
-                        <FormControlLabel
-                            control={
-                                <Checkbox checked={useDefaultPool} onChange={(event) => handleUseDefaultPoolChange(event)} value="checkedA" />
-                            }
-                            label="Use Default Fighter Pool"
-                        />
-                    </FormControl>
-                }
-            </FormGroup>
-            <FormGroup>
-                {
-                    otherChecks && otherChecks.map((check, index) => {
-                        return <FormControl key={index}>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox checked={otherChecks[index].checked} onChange={(event) => handleOtherChecksChange(event, index)} />
-                                }
-                                label={check.name}
-                            />
-                        </FormControl>
-                    })
-                }
-            </FormGroup>
-            <FormGroup row className={classes.formGroup}>
-                {
-                    colors && colors.map((color, index) => {
-                        return <FormControl key={index}>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox checked={colors[index].checked} onChange={(event) => handleFightersColorChange(event, index)} />
-                                }
-                                label={<img src={color.url} alt={color.name} style={{ width: '40px', height: '40px' }} />}
-                            />
-                        </FormControl>
-                    })
-                }
-            </FormGroup>
-            <FormGroup row className={classes.formGroup}>
-                {
-                    types && types.map((type, index) => {
-                        return <FormControl key={index}>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox checked={types[index].checked} onChange={(event) => handleFightersTypeChange(event, index)} />
-                                }
-                                label={<img src={type.url} alt={type.name} style={{ width: '40px', height: '40px' }} />}
-                            />
-                        </FormControl>
-                    })
-                }
-            </FormGroup>
-            <FormGroup row className={classes.formGroup}>
-                {
-                    rarities && rarities.map((rarity, index) => {
-                        return <FormControl key={index}>
-                            <FormControlLabel
-                                control={
-                                    <Checkbox checked={rarities[index].checked} onChange={(event) => handleFightersRaritiesChange(event, index)} />
-                                }
-                                label={<img src={rarity.url} alt={rarity.name} style={{ width: '44px', height: '30px' }} />}
-                            />
-                        </FormControl>
-                    })
-                }
-            </FormGroup>
-            <FormControl>
-                <Button onClick={() => resetFighters()} variant="outlined" color="secondary" size="large">Reset</Button>
-                <Button style={{ marginTop: '20px' }} onClick={() => moveSelection()} variant="outlined" color="secondary" size="large">Move Selection</Button>
-            </FormControl>
-            <UpdateFighters />
-        </form>
-    }
+
 
     const UpdateFighters = () => {
         return <><FormGroup>
@@ -545,11 +346,11 @@ export default function PoolContainer() {
     const [{ hovered }, dropRef] = useDrop({
         accept: 'CARD',
         drop(item, monitor) {
-            if(item.from !== 'fighters'){
+            if (item.from !== 'fighters') {
                 let allSelected = [...selectedFighters];
                 let removedFighter = allSelected.splice(item.index, 1);
                 let allFighters = [...fighters];
-                allFighters.splice(0,0,removedFighter[0]);
+                allFighters.splice(0, 0, removedFighter[0]);
                 setFighters([...allFighters]);
                 setSelectedFighters(...[allSelected]);
             }
@@ -565,18 +366,44 @@ export default function PoolContainer() {
         {
             error && <CustomMessage handleClose={handleClose} open={error ? true : false} type="error" message={error} />
         }
-        <Container ref={dropRef} className={clsx({[classes.hovered]: hovered}, classes.section)}>
+        <Container ref={dropRef} className={clsx({ [classes.hovered]: hovered }, classes.section)}>
             <Grid container>
-                <Grid item md={5} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <Grid item md={5} className={classes.grid}>
+                    <div>
                         {
                             !updateMode && <FormGroup>
                                 <FormControl>
-                                    <Typography className={classes.title} variant="h5">Create Default Pool</Typography>
+                                    <Typography variant="h5">Create Default Pool</Typography>
                                     <TextField style={{ margin: '15px 0' }} helperText="Must contain at least 6 characters" id="standard-basic" label="Pool Name" variant="outlined" onChange={(event) => handlePoolNameChange(event)} value={poolName} />
                                 </FormControl>
                             </FormGroup>
                         }
+                        <FormGroup>
+                            {
+                                <FormControl style={{ marginTop: '10px' }}>
+                                    <FormControlLabel
+                                        control={
+                                            <Checkbox checked={useDefaultPool} onChange={(event) => handleUseDefaultPoolChange(event)} value="checkedA" />
+                                        }
+                                        label="Use Default Fighter Pool"
+                                    />
+                                </FormControl>
+                            }
+                        </FormGroup>
+                        <FormGroup>
+                            {
+                                otherChecks && otherChecks.map((check, index) => {
+                                    return <FormControl key={index}>
+                                        <FormControlLabel
+                                            control={
+                                                <Checkbox checked={otherChecks[index].checked} onChange={(event) => handleOtherChecksChange(event, index)} />
+                                            }
+                                            label={check.name}
+                                        />
+                                    </FormControl>
+                                })
+                            }
+                        </FormGroup>
                         <FilterFighters />
                     </div>
                 </Grid>

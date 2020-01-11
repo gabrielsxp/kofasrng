@@ -1,5 +1,6 @@
 const BASE_URL = 'http://localhost:3001';
 const CLIENT_URL = 'http://localhost:3000';
+const URL = 'https://www.kofasgacha.com';
 
 export default {
     BASE_URL,
@@ -7,10 +8,15 @@ export default {
     PRE_SUMMON_TIME: 500,
     HOME: '/home',
     SUMMON: '/summon',
-    ADMIN: '/panel',
+    PULL: '/pull/',
+    BANNERS: '/banners',
+    ADMIN: '/dashboard',
     SIGN_IN: '/signin',
     SIGN_UP: '/signup',
+    PRIVACY: '/privacy',
+    STATS: '/stats',
     TOPPULLS: '/top',
+    SHARE_BASE_URL: URL + '/pull/',
     DEFAULT_POOL_ID: '5e14a00f6a9c8e4d2034486d',
     CREATE_POOL: `/pool`,
     FIGHTERS_REQUEST: '/fighters',

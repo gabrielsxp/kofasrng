@@ -91,9 +91,9 @@ export default function Header() {
         {
             !loading && fighters.length > 0 && <div className={classes.root} >
                 <Typography className={classes.title} variant="h5">Luckiest Summon of today</Typography>
-                <Typography vairant="h6" style={{ color: "#fff" }}>* Updates every 10 minutes</Typography>
+                <Typography style={{ color: "#fff" }}>* Updates every 10 minutes and only includes Front-Page Banners</Typography>
                 <Grid container className={classes.center}>
-                    <Grid item xs={10} lg={5} >
+                    <Grid item xs={10} lg={6} >
                         <SummonerContainer display flipped fighters={fighters} />
                         <div className={classes.title} style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
                             <div style={{display: 'flex', flexDirection: 'column', textAlign: 'right'}}>
