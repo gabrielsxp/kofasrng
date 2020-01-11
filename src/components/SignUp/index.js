@@ -103,14 +103,19 @@ function SignUp({ history }) {
 
   const checkEmail = async () => {
     try {
-      const response = await axios.post(`${constants.BASE_URL}/check/user`, { email });
-      console.log(response);
-      if (response.data.valid) {
-        setValidEmail(true);
+      const regex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      if (regex.test(email)){
+        const response = await axios.post(`${constants.BASE_URL}/check/user`, { email });
+        if (response.data.valid) {
+          setValidEmail(true);
+        } else {
+          setValidEmail(false);
+        }
       } else {
         setValidEmail(false);
       }
     } catch (error) {
+      console.log(error);
       handleError('Unable to check if the password is valid');
     }
   }

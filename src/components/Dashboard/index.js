@@ -26,6 +26,11 @@ const ChangePassword = Loadable({
     loading: Loading
 });
 
+const Favourites = Loadable({
+    loader: () => import('../Favourites/index'),
+    loading: Loading
+})
+
 const FighterCollection = Loadable({
     loader: () => import('../FighterCollection'),
     loading: Loading
@@ -53,10 +58,11 @@ export default function Dashboard() {
             {
                 currentItem === 0 ? <AccountOverview /> :
                     currentItem === 1 ? <FighterCollection /> :
-                        currentItem === 2 ? <BannerContainer /> :
-                            currentItem === 3 ? <PoolContainer /> :
-                                currentItem === 4 ? <ChangePassword /> :
-                                    null
+                        currentItem === 2 ? <Favourites /> :
+                            currentItem === 3 ? <BannerContainer /> :
+                                currentItem === 4 ? <PoolContainer /> :
+                                    currentItem === 5 ? <ChangePassword /> :
+                                        null
             }
         </Container>
         <DashboardSidebar />

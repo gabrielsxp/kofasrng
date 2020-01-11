@@ -11,15 +11,8 @@ import BarChart from '../BarChart/index';
 import Loading from '../Loading/index';
 import Footer from '../Footer/index';
 import axios from '../../axios';
+import ShareComponent from '../ShareComponent/index';
 import constants from '../../constants';
-import {
-    FacebookShareButton,
-    FacebookIcon,
-    TwitterShareButton,
-    TwitterIcon,
-    WhatsappShareButton,
-    WhatsappIcon,
-} from "react-share";
 import { useLocation } from 'react-router';
 import { getCurrentUser } from '../../services/Auth/index';
 
@@ -253,43 +246,20 @@ export default function Summon() {
                         <img className={classes.image} src={`${banner.createdBy === 'admin' ? constants.BANNER_URL + banner.image : banner.image}`} alt={banner.name} />
                     </Grid>
                 </ Grid>
+                <Grid xs={12}>
+                    <div className={classes.actionButtons}>
+                        <SummonButton disabled={!display} summon={preSummon} type="single" title="Summon x1" cost={banner.singleCost} />
+                        <SummonButton disabled={!display} summon={preSummon} type="multi" title="Summon x10" cost={(banner.multiCost)} />
+                    </div>
+                </Grid>
                 <Grid container className={classes.alignBanner}>
                     <Grid item xs={10} lg={6}>
                         {
                             fighters && fighters.length > 0 && <>
                                 <SummonContainer display={display} fighters={fighters} flipped={true} />
-                                <div style={{ width: '100%', padding: '10px', marginTop: '10px', display: 'flex', alignItems: 'center'}}>
-                                    <span style={{marginRight: '15px'}}>Share this summon: </span><FacebookShareButton
-                                        url={constants.SHARE_BASE_URL + summon}
-                                        quote={`Look at this summon`}
-                                        style={{marginRight: '15px'}}
-                                    >
-                                        <FacebookIcon size={32} round />
-                                    </FacebookShareButton>
-                                    <TwitterShareButton
-                                        url={constants.SHARE_BASE_URL + summon}
-                                        quote={`Look at this summon`}
-                                        style={{marginRight: '15px'}}
-                                    >
-                                        <TwitterIcon size={32} round />
-                                    </TwitterShareButton>
-                                    <WhatsappShareButton
-                                        url={constants.SHARE_BASE_URL + summon}
-                                        quote={`Look at this summon`}
-                                    >
-                                        <WhatsappIcon size={32} round />
-                                    </WhatsappShareButton>
-                                </div>
+                                {summon && <ShareComponent dark hasUser={user !== null} summon={summon} />}
                             </>
                         }
-                    </Grid>
-
-                    <Grid xs={12}>
-                        <div className={classes.actionButtons}>
-                            <SummonButton disabled={!display} summon={preSummon} type="single" title="Summon x1" cost={banner.singleCost} />
-                            <SummonButton disabled={!display} summon={preSummon} type="multi" title="Summon x10" cost={(banner.multiCost)} />
-                        </div>
-                        <hr />
                     </Grid>
                     <Grid xs={12} md={6} style={{ margin: '20px' }}>
                         <Typography variant="h6">Your stats</Typography>
@@ -301,7 +271,7 @@ export default function Summon() {
                             }
                         </div>
                         {
-                            user && <Button disabled={loadRelatory} variant="contained" onClick={getRelatory} style={{ marginBottom: '20px' }}>{loadRelatory ? 'Generating Relatory' : 'Generate Relatory'}</Button>
+                            user && <Button disabled={loadRelatory} color="primary" variant="contained" onClick={getRelatory} style={{ marginBottom: '20px' }}>{loadRelatory ? 'Generating Relatory' : 'Generate Relatory'}</Button>
                         }
                         {
                             user && totalRubies && fightersRelatory && !loading && <div className={classes.container} style={{ marginTop: '20px', padding: '20px', border: '5px solid #dedede' }}>
