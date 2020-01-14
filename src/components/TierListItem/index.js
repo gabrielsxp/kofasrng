@@ -1,7 +1,9 @@
 import React from 'react';
+import moment from 'moment';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Tooltip from '@material-ui/core/Tooltip';
+import ShareComponent from '../ShareComponent/index';
 import constants from '../../constants';
 
 const useStyles = makeStyles(theme => ({
@@ -10,7 +12,10 @@ const useStyles = makeStyles(theme => ({
         height: '100px',
         border: `5px solid ${theme.palette.primary.main}`,
         borderRadius: '5px',
-        marginBottom: theme.spacing(2)
+        marginBottom: theme.spacing(2),
+        [theme.breakpoints.down('md')]: {
+            marginBottom: 0
+        }
     },
     linearFighters: {
         position: 'relative',
@@ -29,7 +34,7 @@ const useStyles = makeStyles(theme => ({
         right: props => `${props.index * 30}px`,
         cursor: 'pointer',
         boxShadow: '7px 7px 5px 0px rgba(50, 50, 50, 0.3)',
-        [theme.breakpoints.down('md')]:{
+        [theme.breakpoints.down('md')]: {
             right: props => `${props.index * 20}px`,
             boxShadow: 'none'
         },
@@ -52,16 +57,19 @@ const OverlayCard = (props) => {
     }} className={classes.card}></div></Tooltip>
 }
 
-export default function TierListItem({ fighters, belongsTo }) {
+export default function TierListItem({ fighters, belongsTo, id, created }) {
     const classes = useStyles();
-    return <div className={classes.root}>
-        {belongsTo && <Typography>Created by {belongsTo.username}</Typography>}
-        <div className={classes.linearFighters}>
-            {
-                fighters && fighters.map((fighter, index) => {
-                    return <OverlayCard key={index} fighter={fighter} index={index} />
-                })
-            }
+    return <>
+        {belongsTo && <Typography>Created by {belongsTo.username} {moment(created).fromNow()}</Typography>}
+        <ShareComponent tierlist={id} dark />
+        <div className={classes.root}>
+            <div className={classes.linearFighters}>
+                {
+                    fighters && fighters.map((fighter, index) => {
+                        return <OverlayCard key={index} fighter={fighter} index={index} />
+                    })
+                }
+            </div>
         </div>
-    </div>
+    </>
 }

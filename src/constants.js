@@ -1,6 +1,6 @@
-const BASE_URL = 'http://localhost:3001';
-const CLIENT_URL = 'http://localhost:3000';
-const URL = 'https://www.kofasgacha.com';
+const BASE_URL = 'https://www.kofastools.com:3001';
+const CLIENT_URL = 'http://www.kofastools.com:3000';
+const URL = 'https://www.kofastools.com';
 
 export default {
     BASE_URL,
@@ -14,11 +14,14 @@ export default {
     SIGN_IN: '/signin',
     SIGN_UP: '/signup',
     PRIVACY: '/privacy',
+    TERMS: '/terms.html',
     TIER_LIST_MAKER: '/tiermaker',
     TIER_LISTS: '/tierlists',
     STATS: '/stats',
     TOPPULLS: '/top',
     SHARE_BASE_URL: URL + '/pull/',
+    SHARE_BASE_TIER_URL: URL + '/tierlist/',
+    SHARE_BASE_BANNER_URL: URL + '/summon/',
     TIER_LIST_LAYOUT: `/tiermaker/template/`,
     TIER_LIST: `/tierlist/`,
     DEFAULT_POOL_ID: '5e14a00f6a9c8e4d2034486d',
@@ -41,4 +44,5 @@ export default {
     RED_URL: `${CLIENT_URL}/images/others/Red_circle.webp`,
     GREEN_URL: `${CLIENT_URL}/images/others/Green_circle.webp`,
     YELLOW_URL: `${CLIENT_URL}/images/others/Yellow_circle.webp`,
+    DEFAULT_BANNER_IMAGE: `${CLIENT_URL}/images/banners/default.webp`
 };

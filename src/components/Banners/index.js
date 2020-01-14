@@ -55,7 +55,8 @@ const useStyles = makeStyles(theme => ({
         paddingRight: '15px'
     },
     section: {
-        padding: '80px 0px'
+        padding: '80px 0px',
+        minHeight: '100vh'
     },
     form: {
         [theme.breakpoints.down('xs')]: {

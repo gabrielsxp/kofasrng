@@ -1,5 +1,8 @@
 export const TOKEN_KEY = "token";
 export const USER = "user";
+export const COOKIES = "cookies";
+export const setCookies = () => localStorage.setItem(COOKIES, true);
+export const getCookies = () => localStorage.getItem(COOKIES);
 export const isAuthenticated = () => localStorage.getItem(TOKEN_KEY) !== null;
 export const setCurrentUser = (user) => localStorage.setItem(USER, JSON.stringify(user));
 export const getCurrentUser = () => JSON.parse(localStorage.getItem(USER));

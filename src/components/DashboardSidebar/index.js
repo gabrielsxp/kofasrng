@@ -13,8 +13,9 @@ import { FaUsers } from 'react-icons/fa';
 import { FaChartLine } from 'react-icons/fa';
 import { FaKey } from 'react-icons/fa';
 import { GiRevolt } from 'react-icons/gi';
+import { GiPodium } from 'react-icons/gi';
 import { GiCutDiamond } from 'react-icons/gi';
-import { FaHeart } from 'react-icons/fa';
+import { AiTwotoneHeart } from 'react-icons/ai';
 
 const drawerWidth = 240;
 const smDrawerWidth = 60;
@@ -74,7 +75,8 @@ const useStyles = makeStyles(theme => ({
 const items = [
     { name: 'Stats Overview', icon: FaChartLine },
     { name: 'Fighters Collection', icon: FaUsers },
-    { name: 'Favorites Summons', icon: FaHeart },
+    { name: 'Favorites Summons', icon: AiTwotoneHeart },
+    { name: 'Your Tier Lists', icon: GiPodium },
     { name: 'Create Banner', icon: GiCutDiamond },
     { name: 'Create Default Pool', icon: GiRevolt }
 ];

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { getCurrentUser } from '../../services/Auth/index';
 import { useDrop } from 'react-dnd';
 import clsx from 'clsx';
 import DraggableFighter from '../DraggableFighter/index';
@@ -133,6 +134,7 @@ export default function TierListMaker() {
     const [check, setCheck] = useState(false);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [user, setUser] = useState(null);
     const [error, setError] = useState(false);
 
     const location = useLocation();
@@ -269,7 +271,7 @@ export default function TierListMaker() {
         setLoading(true);
         setSuccess(false);
         try {
-            const response = await axios.post('/tierlist', { lists });
+            const response = await axios.post('/tierlist', { lists, belongsTo: user ? user._id : null });
             if (response.data.tierList) {
                 setSuccess('Tier List Created');
             } else {
@@ -291,7 +293,10 @@ export default function TierListMaker() {
     }
 
     useEffect(() => {
-        console.log('loaded');
+        const us = getCurrentUser();
+        if (us) {
+            setUser(us);
+        }
         loadFighters();
     }, []);
 

@@ -7,39 +7,49 @@ import Loading from '../Loading/index';
 import Button from '@material-ui/core/Button';
 import TierListItem from '../TierListItem/index';
 import CustomMessage from '../CustomMessage/index';
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import Footer from '../Footer/index';
 import constants from '../../constants';
 import axios from '../../axios';
 
 const useStyles = makeStyles(theme => ({
     root: {
         padding: '20px',
+        minHeight: '100vh'
     },
     buttons: {
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'flex-start',
-        justifyContent: 'center',
-        height: '100%',
+        alignItems: 'flex-end',
+        justifyContent: 'space-between',
+        height: '100px',
         paddingLeft: theme.spacing(2),
-        [theme.breakpoints.down('md')]: {
-            padding: theme.spacing(2),
+        marginTop: '54px',
+        [theme.breakpoints.down('sm')]: {
+            height: 'auto',
+            marginTop: '5px',
+            padding: theme.spacing(1),
             flexDirection: 'row',
-            justifyContent: 'space-between'
-        }
+            justifyContent: 'flex-end'
+        },
     },
     downButton: {
         marginTop: theme.spacing(3),
-        [theme.breakpoints.down('md')]: {
-            margin: '0'
+        [theme.breakpoints.down('sm')]: {
+            marginLeft: theme.spacing(2)
         }
+    },
+    center: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     title: {
         marginBottom: '20px'
     },
     section: {
         padding: `${theme.spacing(2)}px 0`,
-        marginBottom: theme.spacing(2)
+        marginBottom: theme.spacing(2),
     },
     grid: {
         padding: '20px'
@@ -49,7 +59,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export default function TierList() {
+export default function TierList({ fromUser }) {
     const classes = useStyles();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
@@ -58,7 +68,13 @@ export default function TierList() {
     const loadLists = async () => {
         setLoading(true);
         try {
-            const response = await axios.get('/tierlists');
+
+            let response = await axios.get('/tierlists');
+            if (fromUser) {
+                response = await axios.get(`/tierlists?user=${fromUser}`);
+            } else {
+                response = await axios.get('/tierlists');
+            }
             if (response.data.tierLists) {
                 let lists = response.data.tierLists;
                 setLists([...lists]);
@@ -85,7 +101,7 @@ export default function TierList() {
         <Container className={classes.root}>
             <Grid container className={classes.section}>
                 <Grid item xs={12}>
-                    <Typography className={classes.title} variant="h5">Last Tier Lists Created Today</Typography>
+                    <Typography className={classes.title} variant="h5">{fromUser ? 'Your Tier Lists' : 'Tier Lists Created Today'}</Typography>
                 </Grid>
                 {
                     loading && <Loading />
@@ -95,21 +111,23 @@ export default function TierList() {
                 }
                 {
                     lists && !loading && lists.map((list, index) => {
-                        return <><Grid item xs={12} md={9} key={index}>
-                            <TierListItem fighters={list.fighters} belongsTo={list.belongsTo} index={0} />
-                        </Grid>
+                        return <Grid container>
+                            <Grid item xs={12} md={9} key={index}>
+                                <TierListItem created={list.createdAt} id={list._id} fighters={list.fighters} belongsTo={list.belongsTo} index={0} />
+                            </Grid>
                             <Grid item xs={12} md={3} className={classes.buttons}>
                                 <Link className={classes.link} to={constants.TIER_LIST_LAYOUT + list._id}>
                                     <Button variant="contained" color="primary">Use this Layout</Button>
-                                </Link>    
+                                </Link>
                                 <Link className={classes.link} to={constants.TIER_LIST + list._id}>
                                     <Button className={classes.downButton} variant="contained" color="secondary">See More</Button>
                                 </Link>
                             </Grid>
-                        </>
+                        </Grid>
                     })
                 }
             </Grid>
         </Container>
+        {!fromUser && <Footer />}
     </>
 }

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getCurrentUser } from '../../services/Auth/index';
 import DashboardContext from './context';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
@@ -32,9 +33,15 @@ const Favourites = Loadable({
 })
 
 const FighterCollection = Loadable({
-    loader: () => import('../FighterCollection'),
+    loader: () => import('../FighterCollection/index'),
     loading: Loading
 });
+
+const TierLists = Loadable({
+    loader: () => import('../TierLists/index'),
+    loading: Loading
+});
+
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -51,7 +58,15 @@ const useStyles = makeStyles(theme => ({
 export default function Dashboard() {
     const classes = useStyles();
     const [currentItem, setCurrentItem] = useState(0);
+    const [user, setUser] = useState(null);
     const values = { currentItem, setCurrentItem };
+
+    useEffect(() => {
+        const us = getCurrentUser();
+        if(us){
+            setUser({...us});
+        }
+    }, []);
 
     return <DashboardContext.Provider value={{ ...values }}>
         <Container className={classes.root} >
@@ -59,10 +74,11 @@ export default function Dashboard() {
                 currentItem === 0 ? <AccountOverview /> :
                     currentItem === 1 ? <FighterCollection /> :
                         currentItem === 2 ? <Favourites /> :
-                            currentItem === 3 ? <BannerContainer /> :
-                                currentItem === 4 ? <PoolContainer /> :
-                                    currentItem === 5 ? <ChangePassword /> :
-                                        null
+                            currentItem === 3 ? <TierLists fromUser={user ? user._id : null} /> :
+                                currentItem === 4 ? <BannerContainer /> :
+                                    currentItem === 5 ? <PoolContainer /> :
+                                        currentItem === 6 ? <ChangePassword /> :
+                                            null
             }
         </Container>
         <DashboardSidebar />

@@ -38,7 +38,7 @@ const useStyles = makeStyles(theme => ({
         padding: '15px 10px',
     },
     title: {
-        padding: '20px'
+        padding: '0px'
     },
     container: {
         borderRadius: '5px'
@@ -197,12 +197,12 @@ export default function Summon() {
 
     const getRelatory = async () => {
         try {
-            const response = await axios.get(`/stats/rubies?days=1&user=${user.username}&banner=${banner._id}`);
+            const response = await axios.get(`/stats/rubies?days=1&user=${user._id}&banner=${banner._id}`);
             setLoadRelatory(true);
             if (response.data.rubies) {
                 let [today] = response.data.rubies;
                 setTotalRubies(today.rubies);
-                let fResponse = await axios.get(`/stats/fighters?days=1&user=${user.username}&banner=${banner._id}`);
+                let fResponse = await axios.get(`/stats/fighters?days=1&user=${user._id}&banner=${banner._id}`);
                 if (fResponse.data.fighters) {
                     setFightersRelatory([...fResponse.data.fighters]);
                     setLoadRelatory(false);
@@ -218,7 +218,31 @@ export default function Summon() {
             setError(error);
             setLoadRelatory(false);
         }
+    }
 
+    const getGlobalRelatory = async () => {
+        try {
+            const response = await axios.get(`/stats/rubies?days=1&banner=${banner._id}`);
+            setLoadRelatory(true);
+            if (response.data.rubies) {
+                let [today] = response.data.rubies;
+                setTotalRubies(today.rubies);
+                let fResponse = await axios.get(`/stats/fighters?days=1&banner=${banner._id}`);
+                if (fResponse.data.fighters) {
+                    setFightersRelatory([...fResponse.data.fighters]);
+                    setLoadRelatory(false);
+                } else {
+                    setError('Unable to get the fighters relatory');
+                    setLoadRelatory(false);
+                }
+            } else {
+                setError('Unable to get today stats');
+                setLoadRelatory(false);
+            }
+        } catch (error) {
+            setError(error);
+            setLoadRelatory(false);
+        }
     }
 
     useEffect(() => {
@@ -240,6 +264,7 @@ export default function Summon() {
         {
             !loading && banner && <Container className={classes.section}>
                 <Typography className={classes.title} variant="h4">{banner.name} Summon</Typography>
+                <ShareComponent banner={banner.slug} dark />
                 <hr />
                 <Grid container className={classes.alignBanner}>
                     <Grid xs={12} md={6} className={classes.alignBanner}>
@@ -271,7 +296,10 @@ export default function Summon() {
                             }
                         </div>
                         {
-                            user && <Button disabled={loadRelatory} color="primary" variant="contained" onClick={getRelatory} style={{ marginBottom: '20px' }}>{loadRelatory ? 'Generating Relatory' : 'Generate Relatory'}</Button>
+                            user && <Button disabled={loadRelatory} color="primary" variant="contained" onClick={getRelatory} style={{ marginBottom: '20px', marginRight: '20px' }}>{loadRelatory ? 'Generating Relatory' : 'Generate Relatory'}</Button>
+                        }
+                        {
+                            user && user.username === banner.createdBy && <Button disabled={loadRelatory} color="secondary" variant="contained" onClick={getGlobalRelatory} style={{ marginBottom: '20px' }}>{loadRelatory ? 'Generating Relatory' : 'Generate Global Relatory'}</Button>
                         }
                         {
                             user && totalRubies && fightersRelatory && !loading && <div className={classes.container} style={{ marginTop: '20px', padding: '20px', border: '5px solid #dedede' }}>

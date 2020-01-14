@@ -11,7 +11,6 @@ const useStyles = makeStyles(theme => ({
         alignItems: 'center',
         justifyContent: 'center',
         width: '100%',
-        height: '25vh',
         padding: '20px',
         textAlign: 'center',
         backgroundColor: theme.palette.primary.main,
@@ -29,8 +28,12 @@ const useStyles = makeStyles(theme => ({
 export default function Footer() {
     const classes = useStyles();
     return <div className={classes.footer}>
-        <Typography>{new Date().getFullYear} King of Fighters All Star Gacha. Disclaimer: We are NOT affiliated with this game, this is a fan site dedicated to the game.</Typography>
+        <Typography>{new Date().getFullYear()} The King of Fighters All Star &reg; Tools.</Typography>
+        <Typography>Disclaimer: We are NOT affiliated with this game, this is a fan site dedicated to the game.</Typography>
         <img className={classes.image} src={Logo} alt="kofas gacha" />
-        <Link style={{color: '#fff', marginTop: '20px'}} to={constants.PRIVACY}>Privacy Policy</Link>
+        <div style={{color: "#fff", marginTop: '20px'}}>
+            <Link style={{color: "#fff"}}  to={constants.PRIVACY}>Privacy Policy</Link> &nbsp; &nbsp;
+            <Link style={{color: "#fff"}} to={constants.TERMS}>Terms of Use</Link>
+        </div>
     </div>
 }

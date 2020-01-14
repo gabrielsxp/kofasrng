@@ -14,7 +14,8 @@ const useStyles = makeStyles(theme => ({
     },
     section: {
         padding: `${theme.spacing(2)}px 0`,
-        marginBottom: theme.spacing(2)
+        marginBottom: theme.spacing(2),
+        minHeight: '100vh'
     },
     grid: {
         padding: '20px'
@@ -57,8 +58,8 @@ export default function Stats() {
             loading && <Loading />
         }
         {
-            stats && !loading && <Container className={classes.section}>
-                <Grid container>
+            stats && !loading && <Container>
+                <Grid container className={classes.section}>
                     <Grid item xs={12} className={classes.grid}>
                         <Typography variant="h5" className={classes.title}>Global Statistics</Typography>
                         <hr />

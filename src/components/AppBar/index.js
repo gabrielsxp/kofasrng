@@ -95,12 +95,15 @@ const useStyles = makeStyles(theme => ({
 const appBarLinks = [
     { title: 'Home', link: constants.HOME },
     { title: 'Banners', link: constants.BANNERS },
-    { title: 'Stats', link: constants.STATS }
+    { title: 'Stats', link: constants.STATS },
+    { title: 'Tier Lists', link: constants.TIER_LISTS }
 ];
 
 const AppBarItem = ({ linkTo, title, onClick }) => {
     let location = useLocation();
-    let thisLocation = title.toLowerCase();
+    let thisLocation = title.toLowerCase().replace(' ', '');
+    
+    console.log(thisLocation, location.pathname);
 
     const classes = useStyles();
     return <div onClick={onClick} key={title} className={clsx(classes.itemContainer, location.pathname.includes(thisLocation) ? classes.active : '')}>
@@ -151,11 +154,11 @@ export default function MainAppBar() {
 
     const MobileItem = ({ linkTo, title, onClick }) => {
         let location = useLocation();
-        var thisLocation = title ? `/` + (title === 'Home' ? '' : title.toLowerCase(title)) : null;
+        var thisLocation = title.toLowerCase(title).replace(' ', '');
         console.log(location.pathname, thisLocation);
 
-        return <Link onClick={onClick} to={linkTo} className={classes.appBarItemMobile}><ListItem button key={title} className={location.pathname === thisLocation ? classes.activeAppBarItemMobile : null}>
-            <ListItemText className={location.pathname === thisLocation ? classes.activeAppBarItemMobileText : null}>
+        return <Link onClick={onClick} to={linkTo} className={classes.appBarItemMobile}><ListItem button key={title} className={location.pathname === `/${thisLocation}` ? classes.activeAppBarItemMobile : null}>
+            <ListItemText className={location.pathname === `/${thisLocation}` ? classes.activeAppBarItemMobileText : null}>
                 {title}
             </ListItemText>
         </ListItem>

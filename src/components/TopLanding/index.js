@@ -45,6 +45,7 @@ export default function TopLanding() {
         setLoading(true);
         try {
             const response = await axios.get('/top/summons?limit=3');
+            console.log(response);
             if (response.data.summons) {
                 setTops([...response.data.summons]);
             } else {
@@ -73,8 +74,11 @@ export default function TopLanding() {
             loading && <Loading />
         }
         {
-            !loading && <Container className={classes.section}>
+            tops && !loading && <Container className={classes.section}>
                 <Typography variant="h6" className={classes.title}>Top Summons of Today</Typography>
+                {
+                    tops && tops.length === 0 && <Typography style={{marginTop: '20px'}} variant="h6">No summons were made today</Typography>
+                }
                 <Grid container className={classes.center}>
                     <Grid item xs={10} lg={6} className={classes.summons}>
                         {

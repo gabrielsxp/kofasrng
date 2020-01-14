@@ -100,7 +100,8 @@ export default function BannerContainer() {
     const [loading, setLoading] = useState(false);
     const [loadPool, setLoadPools] = useState(false);
     const [name, setName] = useState('');
-    const [image, setImage] = useState('');
+    const defaultImage = `/images/banners/default.webp`;
+    const [image, setImage] = useState(defaultImage);
     const [pools, setPools] = useState([]);
     const [banners, setBanners] = useState([]);
     const [updateIndex, setUpdateIndex] = useState(0);
@@ -244,12 +245,16 @@ export default function BannerContainer() {
         setName('');
         setCosts([...baseCosts]);
         setPoolIndex(0);
-        setImage('');
+        setImage(defaultImage);
         setRates({ ...globalRates });
     }
 
     const handleClose = () => {
         setError(false);
+    }
+
+    const handleCloseSuccess = () => {
+        setSuccess(false);
     }
 
     const saveChanges = async () => {
@@ -281,7 +286,7 @@ export default function BannerContainer() {
             try {
                 const response = await axios.patch(`${constants.BASE_URL}/banner/${banners[updateIndex]._id}`, { ...finalObject })
                 if (response.data.banner) {
-                    setSuccess(true);
+                    setSuccess('Banner updated');
                     setUpdateMode(false);
                     setTimeout(() => {
                         setSuccess(false);
@@ -296,7 +301,7 @@ export default function BannerContainer() {
             try {
                 const response = await axios.post(`${constants.BASE_URL}/banner`, { ...finalObject });
                 if (response.data.banner) {
-                    setSuccess(true);
+                    setSuccess('Banner created');
                     setTimeout(() => {
                         setSuccess(false);
                     }, 3000);
@@ -384,6 +389,9 @@ export default function BannerContainer() {
             error && <CustomMessage message={error} type="error" handleClose={handleClose} open={error ? true : false} />
         }
         {
+            success && <CustomMessage message={success} type="success" handleClose={handleCloseSuccess} open={success ? true : false} />
+        }
+        {
             pools && pools.length > 0 ? <Container className={classes.section}>
                 <Grid container>
                     <Grid item xs={12} md={6} className={classes.grid}>
@@ -418,7 +426,7 @@ export default function BannerContainer() {
                             }
                             <FormControl className={classes.space}>
                                 {
-                                    user && user.role === 1 && <>
+                                    user && user.username === 'admin' && <>
                                         <DatePicker type="from" className={classes.space} />
                                         <DatePicker type="to" />
                                     </>
@@ -617,6 +625,7 @@ export default function BannerContainer() {
                                 rates.value[0] !== 0 ||
                                 rates.value[rates.value.length - 1] !== 99 ||
                                 name.length < 6 ||
+                                image === '' ||
                                 (costs[0].value === '' && costs[1].value === '')
                             }
                             onClick={() => saveChanges()} style={{ marginRight: '20px' }} color="primary" variant="contained">{success ? 'OK' : 'Save Changes'}</Button>
