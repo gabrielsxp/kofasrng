@@ -28,7 +28,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export default function ShareComponent({ summon, hasUser, dark }) {
+export default function ShareComponent({ summon, tierlist, banner, hasUser, dark }) {
     const classes = useStyles();
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState(false);
@@ -60,31 +60,82 @@ export default function ShareComponent({ summon, hasUser, dark }) {
         }
         <div className={classes.shrink} style={{ color: `${dark ? '#333' : '#fff'}`, width: '100%' }}>
             <div style={{ width: '100%', marginTop: '10px', display: 'flex', alignItems: 'center' }}>
-                <span style={{ marginRight: '15px' }}>Share this summon: </span><FacebookShareButton
-                    url={constants.SHARE_BASE_URL + summon}
-                    quote={`Look at this summon`}
-                    style={{ marginRight: '15px' }}
-                >
-                    <FacebookIcon size={32} round />
-                </FacebookShareButton>
-                <TwitterShareButton
-                    url={constants.SHARE_BASE_URL + summon}
-                    quote={`Look at this summon`}
-                    style={{ marginRight: '15px' }}
-                >
-                    <TwitterIcon size={32} round />
-                </TwitterShareButton>
-                <WhatsappShareButton
-                    url={constants.SHARE_BASE_URL + summon}
-                    quote={`Look at this summon`}
-                    style={{ marginRight: '10px' }}
-                >
-                    <WhatsappIcon size={32} round />
-                </WhatsappShareButton>
                 {
-                    hasUser && <Tooltip title="Save to favorites"><IconButton onClick={() => saveFavourite()} aria-label="save favorite" color="primary">
-                        <FaHeart style={{ color: '#ffa099', width: '25px', height: '25px', marginBottom: '5px' }} />
-                    </IconButton></Tooltip>
+                    summon && <><span style={{ marginRight: '15px' }}>Share this summon: </span> <FacebookShareButton
+                        url={constants.SHARE_BASE_URL + summon}
+                        quote={`Look at this summon`}
+                        style={{ marginRight: '15px' }}
+                    >
+                        <FacebookIcon size={32} round />
+                    </FacebookShareButton>
+                        <TwitterShareButton
+                            url={constants.SHARE_BASE_URL + summon}
+                            quote={`Look at this summon`}
+                            style={{ marginRight: '15px' }}
+                        >
+                            <TwitterIcon size={32} round />
+                        </TwitterShareButton>
+                        <WhatsappShareButton
+                            url={constants.SHARE_BASE_URL + summon}
+                            quote={`Look at this summon`}
+                            style={{ marginRight: '10px' }}
+                        >
+                            <WhatsappIcon size={32} round />
+                        </WhatsappShareButton>
+                        {
+                            hasUser && <Tooltip title="Save to favorites"><IconButton onClick={() => saveFavourite()} aria-label="save favorite" color="primary">
+                                <FaHeart style={{ color: '#ffa099', width: '25px', height: '25px', marginBottom: '5px' }} />
+                            </IconButton></Tooltip>
+                        }
+                    </>
+                }
+                {
+                    tierlist && <><span style={{ marginRight: '15px' }}>Share this Tier List: </span> <FacebookShareButton
+                        url={constants.SHARE_BASE_TIER_URL + tierlist}
+                        quote={`Look at this Tier List`}
+                        style={{ marginRight: '15px' }}
+                    >
+                        <FacebookIcon size={32} round />
+                    </FacebookShareButton>
+                        <TwitterShareButton
+                            url={constants.SHARE_BASE_TIER_URL + tierlist}
+                            quote={`Look at this Tier List`}
+                            style={{ marginRight: '15px' }}
+                        >
+                            <TwitterIcon size={32} round />
+                        </TwitterShareButton>
+                        <WhatsappShareButton
+                            url={constants.SHARE_BASE_TIER_URL + tierlist}
+                            quote={`Look at this Tier List`}
+                            style={{ marginRight: '10px' }}
+                        >
+                            <WhatsappIcon size={32} round />
+                        </WhatsappShareButton>
+                    </>
+                }
+                {
+                    banner && <><span style={{ marginRight: '15px' }}>Share this Banner </span> <FacebookShareButton
+                        url={constants.SHARE_BASE_BANNER_URL + banner}
+                        quote={`Look at this Tier List`}
+                        style={{ marginRight: '15px' }}
+                    >
+                        <FacebookIcon size={32} round />
+                    </FacebookShareButton>
+                        <TwitterShareButton
+                            url={constants.SHARE_BASE_BANNER_URL + banner}
+                            quote={`Look at this Tier List`}
+                            style={{ marginRight: '15px' }}
+                        >
+                            <TwitterIcon size={32} round />
+                        </TwitterShareButton>
+                        <WhatsappShareButton
+                            url={constants.SHARE_BASE_BANNER_URL + banner}
+                            quote={`Look at this Tier List`}
+                            style={{ marginRight: '10px' }}
+                        >
+                            <WhatsappIcon size={32} round />
+                        </WhatsappShareButton>
+                    </>
                 }
             </div>
         </div>

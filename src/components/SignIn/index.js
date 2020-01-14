@@ -48,6 +48,7 @@ const useStyles = makeStyles(theme => createStyles({
 function SignIn({ history }) {
   const classes = useStyles();
   const [email, setEmail] = useState('');
+  const [validEmail, setValidEmail] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [password, setPassword] = useState('');
@@ -67,6 +68,17 @@ function SignIn({ history }) {
 
   function handleError(message) {
     setError(message);
+  }
+
+
+  const checkEmail = () => {
+    const regex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if(regex.test(email)){
+      setValidEmail(true);
+    } else {
+      setValidEmail(false);
+      setError('Invalid Email format')
+    }
   }
 
   async function signInUser() {
@@ -120,8 +132,10 @@ function SignIn({ history }) {
           <InputLabel htmlFor="input-email">Email</InputLabel>
           <Input
             className={classes.item}
+            onBlur={() => checkEmail()}
             id="input-email"
             type="email"
+            error={!validEmail}
             startAdornment={
               <InputAdornment position="start">
                 <FaEnvelope className={classes.icon} />
@@ -146,7 +160,7 @@ function SignIn({ history }) {
           />
         </FormControl>
         <Link to={constants.recuperarSenha} className={clsx(classes.item, classes.link)}>Forgot password ?</Link>
-        <Button onClick={() => signInUser()} disabled={loading} variant="contained" color="primary">Access</Button>
+        <Button onClick={() => signInUser()} disabled={loading || !validEmail || password.length < 6} variant="contained" color="primary">Access</Button>
         <Button style={{ marginTop: '15px' }} onClick={() => history.push(constants.SIGN_UP)} disabled={loading} color="primary">Create Account</Button>
       </Paper>
     </div >

@@ -1,7 +1,8 @@
 import React, { useContext } from 'react';
+import clsx from 'clsx';
+import Tooltip from '@material-ui/core/Tooltip';
 import TierListContext from '../TierListMaker/context';
 import DraggableFighter from '../DraggableFighter/index';
-import clsx from 'clsx';
 import { useDrop } from 'react-dnd';
 import { makeStyles } from '@material-ui/core/styles';
 import constants from '../../constants';
@@ -27,7 +28,7 @@ const useStyles = makeStyles(theme => ({
         },
         '&::before': {
             content: '""',
-            backgroundImage: props => {return `url(${constants.OTHERS_URL + images[props.index]})`},
+            backgroundImage: props => { return `url(${constants.OTHERS_URL + images[props.index]})` },
             backgroundSize: 'auto',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center',
@@ -41,6 +42,17 @@ const useStyles = makeStyles(theme => ({
             color: '#fff',
             fontSize: '2rem'
         }
+    },
+    genericFighter: {
+        display: 'inline-block',
+        listStyle: 'none',
+        minWidth: '80px',
+        width: '80px',
+        height: '80px',
+        cursor: 'pointer',
+        boxSizing: 'border-box',
+        margin: theme.spacing(2),
+        zIndex: 0
     },
     hovered: {
         border: `5px dashed ${theme.palette.primary.main}`,
@@ -65,11 +77,35 @@ export default function TierListSection(props) {
         }
     });
 
-    return <div ref={dropRef} fighters={props.fighters} className={clsx(classes.list, { [classes.hovered]: hovered })}>
+    const GenericFighter = ({ fighter }) => {
+        const classes = useStyles();
+        return <Tooltip title={fighter.name + fighter.year}><div className={classes.genericFighter}
+            style={{
+                backgroundImage: `url(${constants.FIGHTER_URL + fighter.year + '/' + fighter.image})`,
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: 'contain',
+                backgroundPosition: 'center'
+            }}></div></Tooltip>
+    }
+
+    return <>
         {
-            props.fighters && props.fighters.map((fighter, index) => {
-                return <DraggableFighter key={index} fighter={fighter} index={index} from={props.type} />
-            })
+            !props.disableDrop && <div ref={dropRef} fighters={props.fighters} className={clsx(classes.list, { [classes.hovered]: hovered })}>
+                {
+                    props.fighters && props.fighters.map((fighter, index) => {
+                        return <DraggableFighter key={index} fighter={fighter} index={index} from={props.type} />
+                    })
+                }
+            </div>
         }
-    </div>
+        {
+            props.disableDrop && <div fighters={props.fighters} className={classes.list}>
+                {
+                    props.fighters && props.fighters.map((fighter, index) => {
+                        return <GenericFighter key={index} fighter={fighter} index={index} />
+                    })
+                }
+            </div>
+        }
+    </>
 }

@@ -89,12 +89,12 @@ function SignUp({ history }) {
   const checkUsername = async () => {
     try {
       const obj = { username: name.toLowerCase().replace(/\s/g, "_").replace(/-/g, "_") };
-      const response = await axios.post(`${constants.BASE_URL}/check/user`, { ...obj });
-      console.log(response);
+      const response = await axios.post(`/check/user`, { ...obj });
       if (response.data.valid) {
         setValidUsername(true);
       } else {
         setValidUsername(false);
+        setError('Username already exists');
       }
     } catch (error) {
       handleError('Unable to check if the username is valid');
@@ -105,18 +105,20 @@ function SignUp({ history }) {
     try {
       const regex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
       if (regex.test(email)){
-        const response = await axios.post(`${constants.BASE_URL}/check/user`, { email });
+        const response = await axios.post(`/check/email`, { email });
         if (response.data.valid) {
           setValidEmail(true);
         } else {
           setValidEmail(false);
+          setError('Email already exists');
         }
       } else {
         setValidEmail(false);
+        setError('Invalid email format');
       }
     } catch (error) {
       console.log(error);
-      handleError('Unable to check if the password is valid');
+      handleError('Unable to check if the email is valid');
     }
   }
 

@@ -255,14 +255,13 @@ export default function PoolContainer() {
         }
         handleLoading(constants.CREATE_POOL_SAVE_CHANGES_INDEX, true);
         try {
-            console.log(updateMode);
             let response = null;
             if (updateMode) {
                 poolObject = { fighters: [...selectedFighters] };
                 response = await axios.patch(`/defaultPool/${pools[poolIndex]._id}`, { ...poolObject });
                 if (response.data.defaultPool) {
                     handleLoading(constants.CREATE_POOL_SAVE_CHANGES_INDEX, false);
-                    setSuccess(true);
+                    setSuccess('Pool Updated');
                     setTimeout(() => {
                         setSuccess(false);
                     }, 3000);
@@ -272,7 +271,7 @@ export default function PoolContainer() {
                 console.log(response);
                 if (response.data.defaultPool) {
                     handleLoading(constants.CREATE_POOL_SAVE_CHANGES_INDEX, false);
-                    setSuccess(true);
+                    setSuccess('Pool Created');
                     setTimeout(() => {
                         setSuccess(false);
                     }, 3000)
@@ -315,33 +314,14 @@ export default function PoolContainer() {
         loadPools();
     }, [updateMode]);
 
-    let condition = selectedFighters.some(fighter => fighter.rarity === 'Bronze') &&
-        selectedFighters.some(fighter => fighter.rarity === 'Silver') &&
-        selectedFighters.some(fighter => fighter.rarity === 'Gold');
-
-
-    const UpdateFighters = () => {
-        return <><FormGroup>
-            {
-                pools && pools.length > 0 && <FormControl>
-                    <FormControlLabel
-                        control={
-                            <Checkbox checked={updateMode} onChange={(event) => handleUpdateChange(event)} value="checkedA" />
-                        }
-                        label="Update Existing Pool"
-                    />
-                </FormControl>
-            }
-        </FormGroup>
-            {
-                updateMode && pools && <PoolSelection loadFightersFlag deletePool={deletePool} pools={pools} poolIndex={poolIndex} handlePoolIndex={setPoolIndex} />
-            }
-        </>
-    }
-
     const handleClose = () => {
         setError(false);
     }
+
+    const handleCloseSuccess = () => {
+        setSuccess(false);
+    }
+
 
     const [{ hovered }, dropRef] = useDrop({
         accept: 'CARD',
@@ -362,9 +342,16 @@ export default function PoolContainer() {
         }
     });
 
+    let condition = selectedFighters.some(fighter => fighter.rarity === 'Bronze') &&
+        selectedFighters.some(fighter => fighter.rarity === 'Silver') &&
+        selectedFighters.some(fighter => fighter.rarity === 'Gold');
+
     return <PoolContext.Provider value={{ ...values }}>
         {
             error && <CustomMessage handleClose={handleClose} open={error ? true : false} type="error" message={error} />
+        }
+        {
+            success && <CustomMessage handleClose={handleCloseSuccess} open={success ? true : false} type="success" message={success} />
         }
         <Container ref={dropRef} className={clsx({ [classes.hovered]: hovered }, classes.section)}>
             <Grid container>
