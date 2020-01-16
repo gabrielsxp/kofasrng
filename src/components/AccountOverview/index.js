@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import {getCurrentUser} from '../../services/Auth/index';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import CustomMessage from '../CustomMessage/index';
@@ -71,6 +72,7 @@ export default function AccountOverview() {
     const classes = useStyles();
 
     const [stats, setStats] = useState(null);
+    const [user, setUser] = useState(null);
     const [fighters, setFighters] = useState(null);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(null);

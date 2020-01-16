@@ -148,7 +148,7 @@ export default function BannerSection() {
                 {
                     banners && !loading && banners.map((banner, index) => {
                         return <Grid key={index} item md={6} lg={4} xs={12}>
-                            <Banner name={banner.name} image={banner.createdBy === 'admin' ? constants.BANNER_URL + banner.image : banner.image} slug={banner.slug} />
+                                <Banner name={banner.name} image={banner.createdBy === 'admin' ? constants.BANNER_URL + banner.image : banner.image} slug={banner.slug} />
                         </Grid>
                     })
                 }

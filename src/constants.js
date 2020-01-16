@@ -1,11 +1,24 @@
-const BASE_URL = 'https://www.kofastools.com:3001';
-const CLIENT_URL = 'http://www.kofastools.com:3000';
-const URL = 'https://www.kofastools.com';
+const BASE_URL = 'http://localhost:3001';
+    const CLIENT_URL = 'http://localhost:3000';
+    const URL = 'http://localhost:3000';
+/*
+    Local environment
+    const BASE_URL = 'http://localhost:3001';
+    const CLIENT_URL = 'http://localhost:3000';
+    const URL = 'http://localhost:3000';
+
+    Production environment
+    const BASE_URL = 'https://api.kofastools.com';
+    const CLIENT_URL = 'https://www.kofastools.com';
+    const URL = 'https://www.kofastools.com';
+*/
 
 export default {
     BASE_URL,
+    CLIENT_URL,
     FLIP_TIME: 1500,
     PRE_SUMMON_TIME: 500,
+    NUMBER_OF_SUMMONS_ON_TOP: 6,
     HOME: '/home',
     SUMMON: '/summon',
     PULL: '/pull/',
@@ -14,7 +27,7 @@ export default {
     SIGN_IN: '/signin',
     SIGN_UP: '/signup',
     PRIVACY: '/privacy',
-    TERMS: '/terms.html',
+    TERMS: '/terms',
     TIER_LIST_MAKER: '/tiermaker',
     TIER_LISTS: '/tierlists',
     STATS: '/stats',
@@ -24,7 +37,7 @@ export default {
     SHARE_BASE_BANNER_URL: URL + '/summon/',
     TIER_LIST_LAYOUT: `/tiermaker/template/`,
     TIER_LIST: `/tierlist/`,
-    DEFAULT_POOL_ID: '5e14a00f6a9c8e4d2034486d',
+    DEFAULT_POOL_ID: '5e2079aa977fcd001347c0b5', //local '5e14a00f6a9c8e4d2034486d'//production '5e1e6ab68095d700130374fb'
     CREATE_POOL: `/pool`,
     FIGHTERS_REQUEST: '/fighters',
     FIGHTERS_INDEX: 0,

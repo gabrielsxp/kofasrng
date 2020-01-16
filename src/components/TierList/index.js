@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import Container from '@material-ui/core/Container';
+import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
@@ -10,6 +11,8 @@ import CustomMessage from '../CustomMessage';
 import Footer from '../Footer/index';
 import Loading from '../Loading/index';
 import ShareComponent from '../ShareComponent/index';
+import { Link } from 'react-router-dom';
+import constants from '../../constants';
 import axios from '../../axios';
 
 const useStyles = makeStyles(theme => ({
@@ -92,22 +95,26 @@ export default function TierList() {
         {
             loading && <Loading />
         }
-
         <Container className={classes.section}>
             {tierList && !loading && <Grid container>
                 <Grid item xs={12} className={classes.grid}>
                     <Typography variant="h5" className={classes.title}>Tier List</Typography>
-                    { 
-                        tierList.belongsTo && 
-                        tierList.createdAt &&  
-                        <Typography>Created by {tierList.belongsTo.username} {moment(tierList.createdAt).fromNow()}</Typography> 
+                    {
+                        tierList.belongsTo &&
+                        tierList.createdAt &&
+                        <Typography>Created by {tierList.belongsTo.username} {moment(tierList.createdAt).fromNow()}</Typography>
                     }
                     <hr />
                     <Grid container className={classes.center}>
                         <Grid item xs={12} md={10}>
                             <ShareComponent tierlist={tierList._id} dark />
                             {
-                                tierList.lists && tierList.lists.map((list, index) => {
+                                tierList && !loading && <Link className={classes.link} to={constants.TIER_LIST_LAYOUT + tierList._id}>
+                                    <Button style={{ marginBottom: '20px' }} variant="outlined" color="secondary">Use this template</Button>
+                                </Link>
+                            }
+                            {
+                                tierList.lists && !loading && tierList.lists.map((list, index) => {
                                     return <TierListSection disableDrop index={index} fighters={list.fighters} />
                                 })
                             }

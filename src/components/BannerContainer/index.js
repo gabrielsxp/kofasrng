@@ -52,7 +52,8 @@ const useStyles = makeStyles(theme => ({
     image: {
         width: '100%',
         height: 'auto',
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
+        borderRadius: '5px'
     },
     slider: {
         width: '90%',
@@ -100,7 +101,7 @@ export default function BannerContainer() {
     const [loading, setLoading] = useState(false);
     const [loadPool, setLoadPools] = useState(false);
     const [name, setName] = useState('');
-    const defaultImage = `/images/banners/default.webp`;
+    const defaultImage = `/images/banners/default.jpg`;
     const [image, setImage] = useState(defaultImage);
     const [pools, setPools] = useState([]);
     const [banners, setBanners] = useState([]);
@@ -129,6 +130,7 @@ export default function BannerContainer() {
     const dispatch = useDispatch();
 
     const loadBanners = async () => {
+        setLoading(true);
         try {
             const response = await axios.get(`${constants.BASE_URL}/banners/`);
             if (response.data.banners) {
@@ -140,8 +142,10 @@ export default function BannerContainer() {
                     resetFields();
                 }
             }
+            setLoading(false);
         } catch (error) {
-            console.log(error);
+            setError('Unable to get the banners');
+            setLoading(false);
         }
     }
 
@@ -194,50 +198,54 @@ export default function BannerContainer() {
     const deleteBanner = async () => {
         try {
             const response = await axios.delete(`/banner/${banners[updateIndex]._id}`);
-            if (response.data.success) {
-                let b = loadBanners();
-                setBanners([...b]);
+            if(response.data.success){
+                setSuccess('Banner Deleted');
+                loadBanners();
                 setUpdateIndex(0);
+            } else {
+                setError(response.data.error);
             }
         } catch (error) {
-            console.log(error);
+            setError('Unable to delete this banner');
         }
     }
 
     const setFields = (index) => {
-        let banner = banners[index];
-        let name = banner.name;
-        let costs = [...baseCosts];
-        costs[0].value = banner.singleCost;
-        costs[1].value = banner.multiCost;
+        if (banners.length > 0) {
+            let banner = banners[index];
+            let name = banner.name;
+            let costs = [...baseCosts];
+            costs[0].value = banner.singleCost;
+            costs[1].value = banner.multiCost;
 
-        let poolIndex = pools.findIndex((p) => p._id === banner.pool);
-        let image = banner.image;
-        let rates = { value: banner.rates, min: 0, max: 99 };
-        let fesRates = banner.fesRates.map(f => f.rate);
-        let asRates = banner.asRates.map(f => f.rate);
-        let hasFes = fesRates.length > 0;
-        let hasAS = fesRates.length > 0;
-        let start = banner.start;
-        let end = banner.end;
+            let poolIndex = pools.findIndex((p) => p._id === banner.pool);
+            let image = banner.image;
+            let rates = { value: banner.rates, min: 0, max: 99 };
+            let fesRates = banner.fesRates.map(f => f.rate);
+            let asRates = banner.asRates.map(f => f.rate);
+            let hasFes = fesRates.length > 0;
+            let hasAS = fesRates.length > 0;
+            let start = banner.start;
+            let end = banner.end;
 
-        setName(name);
-        setCosts([...costs]);
-        setPoolIndex(poolIndex !== -1 ? poolIndex : 0);
-        setImage(image);
-        setRates({ ...rates });
-        dispatch({ type: 'BANNER_START_DATE', fromDate: start });
-        dispatch({ type: 'BANNER_END_DATE', toDate: end });
+            setName(name);
+            setCosts([...costs]);
+            setPoolIndex(poolIndex !== -1 ? poolIndex : 0);
+            setImage(image);
+            setRates({ ...rates });
+            dispatch({ type: 'BANNER_START_DATE', fromDate: start });
+            dispatch({ type: 'BANNER_END_DATE', toDate: end });
 
-        let ratesLength= banner.rates.length;
-        let max = banner.rates[ratesLength-1] - banner.rates[ratesLength-2];
-        if(hasFes){    
-            setFesRates([...fesRates]);
-            setFesMaxRates(max);
-        }
-        if(hasAS){
-            setASRates([...asRates]);
-            setASMaxRates(max);
+            let ratesLength = banner.rates.length;
+            let max = banner.rates[ratesLength - 1] - banner.rates[ratesLength - 2];
+            if (hasFes) {
+                setFesRates([...fesRates]);
+                setFesMaxRates(max);
+            }
+            if (hasAS) {
+                setASRates([...asRates]);
+                setASMaxRates(max);
+            }
         }
     }
 
@@ -410,7 +418,7 @@ export default function BannerContainer() {
                             <FormControl>
                                 {
 
-                                    banners && banners.length > 0 && updateMode && <PoolSelection deletePool={deleteBanner} pools={banners} poolIndex={updateIndex} handlePoolIndex={handleChangeUpdateSelection} />
+                                    banners && updateMode && banners.length > 0 && <PoolSelection deletePool={deleteBanner} pools={banners} poolIndex={updateIndex} handlePoolIndex={handleChangeUpdateSelection} loadFightersFlag={false} />
 
                                 }
                             </FormControl>
@@ -453,7 +461,10 @@ export default function BannerContainer() {
                                 }
                             </FormControl>
                             <FormControl className={classes.space}>
-                                <TextField required size="small" style={{ margin: '15px 0' }} id="image-anchor-field" label="Image Link" variant="outlined" onChange={(event) => handleImageChange(event)} value={image} />
+                                <TextField required size="small" style={{ margin: '15px 0' }}
+                                    id="image-anchor-field" label="Image Link" variant="outlined"
+                                    onChange={(event) => handleImageChange(event)}
+                                    value={image} />
                             </FormControl>
                             <FormControl>
                                 <Typography variant="h6" style={{ marginBottom: '20px' }}>Set Fighter Rates</Typography>
@@ -595,7 +606,7 @@ export default function BannerContainer() {
                                                         backgroundPosition: 'center',
                                                         marginRight: '20px'
                                                     }}></div></Tooltip>
-                                                    <Typography>{index === 0 ? ASRates[index].toFixed(2) + "%" : (ASRates[index] - ASRates[index - 1]).toFixed(2) + "%"}</Typography>
+                                                    <Typography>{index === 0 ? ASRates[index] + "%" : (ASRates[index] - ASRates[index - 1]) + "%"}</Typography>
                                                 </div>
                                             </FormControl>
                                         })
@@ -610,7 +621,7 @@ export default function BannerContainer() {
                             {
                                 user && image !== '' && <img
                                     className={classes.image}
-                                    src={user.username === 'admin' ? constants.BANNER_URL + image : image}
+                                    src={!user.username.match('admin') ? constants.CLIENT_URL + image : constants.CLIENT_URL + '/images/banners/' + image}
                                     alt={name}
                                 />
                             }

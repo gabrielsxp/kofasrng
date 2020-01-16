@@ -5,6 +5,8 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import InputLabel from '@material-ui/core/InputLabel';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
 import Input from '@material-ui/core/Input';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import FormControl from '@material-ui/core/FormControl';
@@ -57,6 +59,7 @@ function SignUp({ history }) {
   const [passwordsMatch, setPasswordsMatch] = useState(false);
   const [validUsername, setValidUsername] = useState(false);
   const [validEmail, setValidEmail] = useState(false);
+  const [agreed, setAgreed] = useState(true);
   const dispatch = useDispatch();
 
   const handleNameChange = (event) => {
@@ -104,7 +107,7 @@ function SignUp({ history }) {
   const checkEmail = async () => {
     try {
       const regex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      if (regex.test(email)){
+      if (regex.test(email)) {
         const response = await axios.post(`/check/email`, { email });
         if (response.data.valid) {
           setValidEmail(true);
@@ -240,7 +243,15 @@ function SignUp({ history }) {
             onChange={(e) => handlePasswordConfirmChange(e)}
           />
         </FormControl>
-        <Button onClick={() => signUpUser()} disabled={loading || !passwordsMatch || !validUsername} variant="contained" color="primary">Create</Button>
+        <FormControl>
+            <FormControlLabel
+              control={
+                <Checkbox checked={agreed} onChange={(event) => setAgreed(event.target.checked)} />
+              }
+              label={'I agree with the Policy and the Terms of this website'}
+            />
+        </FormControl>
+        <Button onClick={() => signUpUser()} disabled={!agreed || loading || !passwordsMatch || !validUsername} variant="contained" color="primary">Create</Button>
       </Paper>
     </div >
   );

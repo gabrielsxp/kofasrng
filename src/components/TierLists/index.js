@@ -10,6 +10,8 @@ import CustomMessage from '../CustomMessage/index';
 import { Link } from 'react-router-dom';
 import Footer from '../Footer/index';
 import constants from '../../constants';
+import CallToAction from '../CallToAction/index';
+import tierImage from '../../images/cta_tier.jpg';
 import axios from '../../axios';
 
 const useStyles = makeStyles(theme => ({
@@ -24,7 +26,7 @@ const useStyles = makeStyles(theme => ({
         justifyContent: 'space-between',
         height: '100px',
         paddingLeft: theme.spacing(2),
-        marginTop: '54px',
+        marginTop: '70px',
         [theme.breakpoints.down('sm')]: {
             height: 'auto',
             marginTop: '5px',
@@ -98,6 +100,7 @@ export default function TierList({ fromUser }) {
 
     return <>
         {error && <CustomMessage message={error} type="error" handleClose={handleClose} open={error ? true : false} />}
+{!fromUser && <CallToAction title="Make your own Tier List Right Now" buttonTitle="Make a Tier List" img={tierImage} link={constants.TIER_LIST_MAKER} /> }
         <Container className={classes.root}>
             <Grid container className={classes.section}>
                 <Grid item xs={12}>
@@ -117,7 +120,7 @@ export default function TierList({ fromUser }) {
                             </Grid>
                             <Grid item xs={12} md={3} className={classes.buttons}>
                                 <Link className={classes.link} to={constants.TIER_LIST_LAYOUT + list._id}>
-                                    <Button variant="contained" color="primary">Use this Layout</Button>
+                                    <Button variant="contained" color="primary">Use this Template</Button>
                                 </Link>
                                 <Link className={classes.link} to={constants.TIER_LIST + list._id}>
                                     <Button className={classes.downButton} variant="contained" color="secondary">See More</Button>

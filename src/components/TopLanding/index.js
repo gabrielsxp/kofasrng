@@ -13,7 +13,8 @@ import { Link } from 'react-router-dom';
 const useStyles = makeStyles(theme => ({
     summons: {
         display: 'flex',
-        flexWrap: 'wrap'
+        flexWrap: 'wrap',
+        margin: theme.spacing(2)
     },
     center: {
         display: 'flex',
@@ -24,7 +25,7 @@ const useStyles = makeStyles(theme => ({
     },
     title: {
         color: theme.palette.primary.main,
-        paddingRight: '15px'
+        padding: '5px'
     },
     summonWrapper: {
         marginBottom: theme.spacing(2)
@@ -44,7 +45,7 @@ export default function TopLanding() {
     const getTops = async () => {
         setLoading(true);
         try {
-            const response = await axios.get('/top/summons?limit=3');
+            const response = await axios.get(`/top/summons?limit=${constants.NUMBER_OF_SUMMONS_ON_TOP}`);
             console.log(response);
             if (response.data.summons) {
                 setTops([...response.data.summons]);
@@ -75,16 +76,21 @@ export default function TopLanding() {
         }
         {
             tops && !loading && <Container className={classes.section}>
-                <Typography variant="h6" className={classes.title}>Top Summons of Today</Typography>
-                {
-                    tops && tops.length === 0 && <Typography style={{marginTop: '20px'}} variant="h6">No summons were made today</Typography>
-                }
                 <Grid container className={classes.center}>
-                    <Grid item xs={10} lg={6} className={classes.summons}>
+                    <Grid item xs={12}>
+                        <Typography variant="h6" className={classes.title}>Top Summons of Today</Typography>
+                        <hr />
                         {
-                            tops && tops.map((summon, index) => {
-                                return <div className={classes.summonWrapper}>
-                                    <SummonerContainer display flipped fighters={summon.fighters} key={index} />
+                            tops && tops.length === 0 && <>
+                                <Typography style={{ marginTop: '20px' }} variant="h6">No summons were made today</Typography>
+                            </>
+                        }
+                    </Grid>
+                    {
+                        tops && tops.map((summon, index) => {
+                            return <Grid item xs={12} lg={5} className={classes.summons}>
+                                <div className={classes.summonWrapper}>
+                                    <SummonerContainer display fighters={summon.fighters} key={index} />
                                     <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'right' }}>
                                         {
                                             summon.madeBy && <Typography>Pulled by {summon.madeBy.username}</Typography>
@@ -96,11 +102,11 @@ export default function TopLanding() {
                                         }
                                     </div>
                                 </div>
-                            })
-                        }
-                    </Grid>
+                            </Grid>
+                        })
+                    }
                 </Grid>
             </Container>
-        }
+}
     </>
 }

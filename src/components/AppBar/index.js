@@ -107,7 +107,7 @@ const AppBarItem = ({ linkTo, title, onClick }) => {
 
     const classes = useStyles();
     return <div onClick={onClick} key={title} className={clsx(classes.itemContainer, location.pathname.includes(thisLocation) ? classes.active : '')}>
-        <Link to={linkTo} className={clsx(classes.appBarItem, location.pathname.includes(thisLocation) ? classes.activeText : null)}>
+        <Link to={linkTo ? linkTo : "#"} className={clsx(classes.appBarItem, location.pathname.includes(thisLocation) ? classes.activeText : null)}>
             <Typography>{title}</Typography>
         </Link>
     </div>
@@ -157,7 +157,7 @@ export default function MainAppBar() {
         var thisLocation = title.toLowerCase(title).replace(' ', '');
         console.log(location.pathname, thisLocation);
 
-        return <Link onClick={onClick} to={linkTo} className={classes.appBarItemMobile}><ListItem button key={title} className={location.pathname === `/${thisLocation}` ? classes.activeAppBarItemMobile : null}>
+        return <Link onClick={onClick} to={linkTo ? linkTo : "#"} className={classes.appBarItemMobile}><ListItem button key={title} className={location.pathname === `/${thisLocation}` ? classes.activeAppBarItemMobile : null}>
             <ListItemText className={location.pathname === `/${thisLocation}` ? classes.activeAppBarItemMobileText : null}>
                 {title}
             </ListItemText>
@@ -170,7 +170,7 @@ export default function MainAppBar() {
             <List>
                 {
                     appBarLinks ? appBarLinks.map((item, index) => {
-                        return <MobileItem onClick={() => closeMobileMenu()} linkTo={item.link} title={item.title} key={index} />
+                        return <MobileItem onClick={() => closeMobileMenu()} linkTo={item.link ? item.link : "#"} title={item.title} key={index} />
                     }) : null
                 }
                 {

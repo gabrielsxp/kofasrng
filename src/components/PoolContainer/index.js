@@ -15,6 +15,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
+import Loading from '../Loading/index';
 import green from '@material-ui/core/colors/green';
 import axios from '../../axios';
 import FilterFighters from '../FilterFighters/index';
@@ -90,7 +91,7 @@ export default function PoolContainer() {
     const [error, setError] = useState(false);
     const [poolName, setPoolName] = useState('');
     const [useDefaultPool, setUseDefaultPool] = useState(true);
-    
+
     const [otherChecks, setOtherChecks] = useState([
         { name: 'FES Fighter', checked: false },
         { name: 'All Star', checked: false }
@@ -101,16 +102,18 @@ export default function PoolContainer() {
     const [pools, setPools] = useState([]);
 
     const loadPools = async () => {
+        handleLoading(constants.CREATE_POOL_SAVE_CHANGES_INDEX, true);
         try {
             const response = await axios.get(`${constants.BASE_URL}/defaultPool`);
             if (response.data.defaultPools) {
-                console.log(response.data.defaultPools);
                 setPools(response.data.defaultPools);
             } else {
                 setError(`Unable to load the pools`);
             }
+            handleLoading(constants.CREATE_POOL_SAVE_CHANGES_INDEX, false);
         } catch (error) {
             setError(`Unable to load the pools`);
+            handleLoading(constants.CREATE_POOL_SAVE_CHANGES_INDEX, false);
         }
     }
 
@@ -238,6 +241,7 @@ export default function PoolContainer() {
         try {
             const response = await axios.delete(`${constants.BASE_URL}/defaultPool/${id}`);
             if (response.data.success) {
+                setSuccess('Pool Deleted');
                 loadPools();
                 setPoolIndex(0);
             } else {
@@ -292,6 +296,10 @@ export default function PoolContainer() {
 
     const handleUpdateChange = (event) => {
         setUpdateMode(event.target.checked);
+    }
+
+    const handlePoolIndex = (index) => {
+        setPoolIndex(index);
     }
 
     const values = {
@@ -365,6 +373,30 @@ export default function PoolContainer() {
                                 </FormControl>
                             </FormGroup>
                         }
+                        {
+                            loading[constants.CREATE_POOL_SAVE_CHANGES_INDEX] && <Loading />
+                        }
+                        {
+                            !loading[constants.CREATE_POOL_SAVE_CHANGES_INDEX] && pools && pools.length > 0 && <>
+                                <FormGroup>
+                                    {
+                                        <FormControl style={{ marginTop: '10px' }}>
+                                            <FormControlLabel
+                                                control={
+                                                    <Checkbox checked={updateMode} onChange={(event) => handleUpdateChange(event)} value="checkedA" />
+                                                }
+                                                label="Update Exisiting Pool"
+                                            />
+                                        </FormControl>
+                                    }
+                                </FormGroup>
+                                {
+                                    updateMode && <FormGroup className={classes.space}>
+                                        <PoolSelection pools={pools} poolIndex={poolIndex} handlePoolIndex={handlePoolIndex} deletePool={deletePool} loadFightersFlag={true} />
+                                    </FormGroup>
+                                }
+                            </>
+                        }
                         <FormGroup>
                             {
                                 <FormControl style={{ marginTop: '10px' }}>
@@ -410,6 +442,6 @@ export default function PoolContainer() {
                     </FormControl>
                 </Grid>
             </Grid>
-        </Container>
+        </Container >
     </PoolContext.Provider >
 }

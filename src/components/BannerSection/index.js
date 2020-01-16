@@ -46,7 +46,7 @@ const useStyles = makeStyles(theme => ({
     },
     title: {
         color: theme.palette.primary.main,
-        paddingRight: '15px'
+        padding: '5px'
     },
     section: {
         padding: '80px 0px'
