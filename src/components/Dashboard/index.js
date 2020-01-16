@@ -7,6 +7,18 @@ import DashboardSidebar from '../DashboardSidebar/index';
 import Loadable from 'react-loadable';
 import Loading from '../Loading/index';
 
+const useStyles = makeStyles(theme => ({
+    root: {
+        display: 'flex',
+        marginLeft: '210px',
+        [theme.breakpoints.down('sm')]: {
+            marginLeft: '60px',
+            width: 'calc(100% - 60px)'
+        },
+        width: 'calc(100% - 210px)'
+    },
+}));
+
 const PoolContainer = Loadable({
     loader: () => import('../PoolContainer/index'),
     loading: Loading
@@ -42,19 +54,6 @@ const TierLists = Loadable({
     loading: Loading
 });
 
-
-const useStyles = makeStyles(theme => ({
-    root: {
-        display: 'flex',
-        marginLeft: '210px',
-        [theme.breakpoints.down('sm')]: {
-            marginLeft: '60px',
-            width: 'calc(100% - 60px)'
-        },
-        width: 'calc(100% - 210px)'
-    },
-}));
-
 export default function Dashboard() {
     const classes = useStyles();
     const [currentItem, setCurrentItem] = useState(0);
@@ -63,8 +62,8 @@ export default function Dashboard() {
 
     useEffect(() => {
         const us = getCurrentUser();
-        if(us){
-            setUser({...us});
+        if (us) {
+            setUser({ ...us });
         }
     }, []);
 

@@ -1,5 +1,6 @@
 import React from 'react';
-import {makeStyles} from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
+import Tooltip from '@material-ui/core/Tooltip';
 import { Link } from 'react-router-dom';
 import constants from '../../constants';
 
@@ -16,7 +17,7 @@ const useStyles = makeStyles(theme => ({
 export default function Banner({ name, image, slug }) {
     const classes = useStyles();
     console.log(image);
-    return <Link to={`${constants.SUMMON}/${slug}`}>
+    return <Tooltip title={name}><Link to={`${constants.SUMMON}/${slug}`}>
         <img src={image} alt={name} className={classes.img}></img>
-    </Link>
+    </Link></Tooltip>
 }

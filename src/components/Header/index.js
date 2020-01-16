@@ -81,11 +81,10 @@ export default function Header() {
                     setBanner(banner);
                 }
                 setFighters([...fighters]);
-                setLoading(false);
             } else {
-                setError(response.data.error);
-                setLoading(false);
+                setFighters(null);
             }
+            setLoading(false);
         } catch (error) {
             setError(error);
             Loading(false);
@@ -105,30 +104,38 @@ export default function Header() {
             loading && <Loading />
         }
         {
-            !loading && fighters.length > 0 && <div className={classes.root} >
+            !loading && <div className={classes.root} >
                 <Typography className={classes.title} variant="h5">Luckiest Summon of today</Typography>
                 <Typography style={{ color: "#fff", padding: '20px', textAlign: 'center' }}>* Updates every 10 minutes and only includes Pulls from Banners of the section below</Typography>
                 <Grid container className={classes.center}>
-                    <Grid item xs={10} lg={6}>
-                    {summon && <ShareComponent hasUser={user !== null} summon={summon} />}
-                        <SummonerContainer display flipped fighters={fighters} />
-                        <Grid container>
-                            <Grid item xs={12}>
-                                <div className={classes.title} style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
-                                    <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'right' }}>
-                                        {
-                                            user && <Typography>Pulled by {user}</Typography>
-                                        }
-                                        {
-                                            banner && <Link to={`${constants.SUMMON}/${banner.slug}`}>
-                                                <Typography className={classes.banner}>{banner.name}</Typography>
-                                            </Link>
-                                        }
+                    {
+                        fighters !== null && fighters.length > 0 && <Grid item xs={10} lg={6}>
+                            {summon && <ShareComponent hasUser={user !== null} summon={summon} />}
+                            <SummonerContainer display flipped fighters={fighters} />
+                            <Grid container>
+                                <Grid item xs={12}>
+                                    <div className={classes.title} style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'right' }}>
+                                            {
+                                                user && <Typography>Pulled by {user}</Typography>
+                                            }
+                                            {
+                                                banner && <Link to={`${constants.SUMMON}/${banner.slug}`}>
+                                                    <Typography className={classes.banner}>{banner.name}</Typography>
+                                                </Link>
+                                            }
+                                        </div>
                                     </div>
-                                </div>
+                                </Grid>
                             </Grid>
                         </Grid>
-                    </Grid>
+                    }
+                    {
+                        fighters !== null && fighters.length === 0 && <Typography className={classes.title}>No pull were made today</Typography>
+                    }
+                    {
+                        fighters === null && <Typography className={classes.title}>No pull were made today</Typography>
+                    }
                 </Grid>
             </div>
         }

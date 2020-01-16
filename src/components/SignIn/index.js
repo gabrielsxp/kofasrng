@@ -10,7 +10,7 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import FormControl from '@material-ui/core/FormControl';
 import CustomMessage from '../CustomMessage/index';
 import { login, setCurrentUser } from '../../services/Auth';
-import { withRouter, Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { FaEnvelope } from 'react-icons/fa';
 import { FaKey } from 'react-icons/fa';
 import constants from '../../constants';
@@ -45,7 +45,7 @@ const useStyles = makeStyles(theme => createStyles({
   }
 }));
 
-function SignIn({ history }) {
+export default function SignIn() {
   const classes = useStyles();
   const [email, setEmail] = useState('');
   const [validEmail, setValidEmail] = useState(false);
@@ -53,6 +53,7 @@ function SignIn({ history }) {
   const [error, setError] = useState(null);
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
+  const history = useHistory();
 
   function handleEmailChange(event) {
     setEmail(event.target.value);
@@ -66,14 +67,9 @@ function SignIn({ history }) {
     setError(false);
   }
 
-  function handleError(message) {
-    setError(message);
-  }
-
-
   const checkEmail = () => {
     const regex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    if(regex.test(email)){
+    if (regex.test(email)) {
       setValidEmail(true);
     } else {
       setValidEmail(false);
@@ -81,7 +77,7 @@ function SignIn({ history }) {
     }
   }
 
-  async function signInUser() {
+  const signInUser = async () => {
 
     setError(null);
 
@@ -91,7 +87,7 @@ function SignIn({ history }) {
     };
 
     if (password === '' || email === '') {
-      handleError('Preencha todos os campos !');
+      setError('Fill all fields');
       return;
     }
 
@@ -101,31 +97,27 @@ function SignIn({ history }) {
       const response = await axios.post(`${constants.BASE_URL}/signin`, { ...data });
       console.log(response);
       if (response.status === 200) {
-        console.log(response.data);
-        setLoading(false);
         login(response.data.token);
         setCurrentUser(response.data.user);
         dispatch({ type: 'AUTHENTICATED_USER', user: response.data.user });
-
-        if (response.data.email === constants.adminEmail) {
-          history.push(`${constants.ADMIN}`);
-          return;
-        }
-        history.push(constants.painel);
+        history.push(constants.ADMIN);
       } else {
-        handleError(response.data.message);
+        console.log(response.data.error);
+        setError(response.data.error);
       }
+      setLoading(false);
     } catch (error) {
-      handleError('Unable to sign in');
+      console.log(error);
+      setError(error);
       setLoading(false);
     }
   }
 
-  return (
+  return <>
+    {
+      error && <CustomMessage handleClose={handleClose} open={error ? true : false} type="error" message={error} />
+    }
     <div className={clsx(classes.align, classes.container)}>
-      {
-        error && <CustomMessage handleClose={handleClose} open={error ? true : false} type="error" message={error} />
-      }
       <Paper elevation={3} className={clsx(classes.wrapper)}>
         <Typography className={classes.item} variant="h6">Access Dashboard</Typography>
         <FormControl>
@@ -163,8 +155,9 @@ function SignIn({ history }) {
         <Button onClick={() => signInUser()} disabled={loading || !validEmail || password.length < 6} variant="contained" color="primary">Access</Button>
         <Button style={{ marginTop: '15px' }} onClick={() => history.push(constants.SIGN_UP)} disabled={loading} color="primary">Create Account</Button>
       </Paper>
-    </div >
-  );
+    </div>
+  </>
 }
 
-export default withRouter(SignIn);
+
+

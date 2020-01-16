@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import clsx from 'clsx';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import BootstrapInput from '../BootstrapInput/index';
@@ -57,6 +57,7 @@ export default function PoolSelection({ pools, poolIndex, handlePoolIndex, delet
     const controlDelete = () => {
         if (enterDeleteMode) {
             deletePool();
+            handleEnterDeleteMode(false);
         } else {
             handleEnterDeleteMode(true);
         }
@@ -79,11 +80,16 @@ export default function PoolSelection({ pools, poolIndex, handlePoolIndex, delet
 
     const handleSelection = (event) => {
         handlePoolIndex(event.target.value);
-        console.log(event.target.value);
         if(loadFightersFlag){
             loadFighters(event.target.value);
         }
     }
+
+    useEffect(() => {
+        if(loadFightersFlag){
+            loadFighters(0);
+        }
+    }, []);
 
     return pools && <div className={classes.root}>
         <FormControl>

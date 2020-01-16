@@ -8,6 +8,7 @@ import Dashboard from '../Dashboard/index';
 import SignIn from '../SignIn/index';
 import SignUp from '../SignUp/index';
 import Privacy from '../Privacy/index';
+import Terms from '../Terms/index';
 import Pull from '../Pull/index';
 import TierListMaker from '../TierListMaker/index';
 import TierLists from '../TierLists/index';
@@ -48,6 +49,7 @@ export default function Routes() {
         <Route path={constants.TIER_LISTS} component={TierLists}></Route>
         <Route path={constants.TIER_LIST} component={TierList}></Route>
         <Route path={constants.PRIVACY} exact>{Privacy}</Route>
+        <Route path={constants.TERMS} exact>{Terms}</Route>
         <PrivateRoute path={`${constants.ADMIN}`} exact component={Dashboard}></PrivateRoute>
         <Route path={`${constants.SIGN_IN}`} exact component={SignIn}></Route>
         <Route path={`${constants.SIGN_UP}`} exact component={SignUp}></Route>
