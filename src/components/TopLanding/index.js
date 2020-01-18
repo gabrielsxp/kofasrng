@@ -36,7 +36,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export default function TopLanding() {
+export default function TopLanding({frontPage}) {
     const classes = useStyles();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
@@ -45,7 +45,7 @@ export default function TopLanding() {
     const getTops = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`/top/summons?limit=${constants.NUMBER_OF_SUMMONS_ON_TOP}`);
+            const response = await axios.get(`/top/summons?limit=${constants.NUMBER_OF_SUMMONS_ON_TOP}${frontPage ? `&admin=true` : ''}`);
             console.log(response);
             if (response.data.summons) {
                 setTops([...response.data.summons]);
@@ -88,7 +88,7 @@ export default function TopLanding() {
                     </Grid>
                     {
                         tops && tops.map((summon, index) => {
-                            return <Grid item xs={12} lg={5} className={classes.summons}>
+                            return <Grid key={index} item xs={12} lg={5} className={classes.summons}>
                                 <div className={classes.summonWrapper}>
                                     <SummonerContainer display fighters={summon.fighters} key={index} />
                                     <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'right' }}>

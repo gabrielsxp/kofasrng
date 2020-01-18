@@ -151,7 +151,7 @@ export default function SignIn() {
             onChange={(e) => handlePasswordChange(e)}
           />
         </FormControl>
-        <Link to={constants.recuperarSenha} className={clsx(classes.item, classes.link)}>Forgot password ?</Link>
+        <Link to={constants.RECOVERY} className={clsx(classes.item, classes.link)}>Forgot password ?</Link>
         <Button onClick={() => signInUser()} disabled={loading || !validEmail || password.length < 6} variant="contained" color="primary">Access</Button>
         <Button style={{ marginTop: '15px' }} onClick={() => history.push(constants.SIGN_UP)} disabled={loading} color="primary">Create Account</Button>
       </Paper>

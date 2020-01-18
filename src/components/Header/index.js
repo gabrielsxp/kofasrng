@@ -65,7 +65,6 @@ export default function Header() {
         setLoading(true);
         try {
             const response = await axios.get(`${constants.BASE_URL}/luckiest/summon`);
-            console.log(response);
             if (response.data.summon) {
                 setSummon(response.data.summon._id);
                 let fighters = response.data.summon.fighters;

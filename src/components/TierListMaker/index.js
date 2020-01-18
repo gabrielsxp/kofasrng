@@ -12,6 +12,7 @@ import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import axios from '../../axios';
 import TierListSection from '../TierListSection/index';
+import ShareComponent from '../ShareComponent/index';
 import Loading from '../Loading/index';
 import CustomMessage from '../CustomMessage/index';
 import red from '@material-ui/core/colors/red';
@@ -19,6 +20,11 @@ import { FaTimes } from 'react-icons/fa';
 import { MdClearAll } from 'react-icons/md';
 import { FaPlus } from 'react-icons/fa';
 import { useLocation } from 'react-router';
+import AppBar from '@material-ui/core/AppBar';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import Box from '@material-ui/core/Box';
+import constants from '../../constants';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -123,19 +129,55 @@ const useStyles = makeStyles(theme => ({
     },
     disabledButton: {
         backgroundColor: "#dedede!important"
+    },
+    iconYear: {
+        width: '80px',
+        height: 'auto'
     }
 }));
+
+function a11yProps(index) {
+    return {
+        id: `scrollable-auto-tab-${index}`,
+        'aria-controls': `scrollable-auto-tabpanel-${index}`,
+    };
+}
+
+const years = [
+    { year: '94', image: `${constants.YEARS}/KOF94_logo.webp` },
+    { year: '95', image: `${constants.YEARS}/KOF95_logo.webp` },
+    { year: '96', image: `${constants.YEARS}/KOF96_logo.webp` },
+    { year: '97', image: `${constants.YEARS}/KOF97_logo.webp` },
+    { year: '98', image: `${constants.YEARS}/KOF98_logo.webp` },
+    { year: '99', image: `${constants.YEARS}/KOF99_logo.webp` },
+    { year: '00', image: `${constants.YEARS}/KOF00_logo.webp` },
+    { year: '01', image: `${constants.YEARS}/KOF01_logo.webp` },
+    { year: '02', image: `${constants.YEARS}/KOF02UM_logo.webp` },
+    { year: '03', image: `${constants.YEARS}/KOF03_logo.webp` },
+    { year: 'XII', image: `${constants.YEARS}/KOF12_logo.webp` },
+    { year: 'XIII', image: `${constants.YEARS}/KOFXIII_logo.webp` },
+    { year: 'XIV', image: `${constants.YEARS}/KOFXIV_logo.webp` },
+    { year: 'AS', image: `${constants.YEARS}/KOFAS_logo.webp` },
+];
+
+var yearsByIndex = [];
+for (let year in years) {
+    yearsByIndex[years[year].year] = parseInt(year);
+}
 
 export default function TierListMaker() {
 
     const classes = useStyles();
-    const [fighters, setFighters] = useState(null);
+    const [fighters, setFighters] = useState([]);
     const [loadingFighters, setLoadingFighters] = useState(false);
     const [check, setCheck] = useState(false);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [user, setUser] = useState(null);
+    const [share, setShare] = useState(false);
+    const [tierList, setTierList] = useState(null);
     const [error, setError] = useState(false);
+    const [value, setValue] = useState(0);
 
     const location = useLocation();
 
@@ -151,32 +193,47 @@ export default function TierListMaker() {
         setCheck(check);
     }
 
+    const GenericIcon = ({ image, year }) => {
+        return <img className={classes.iconYear} src={image} alt={year} />
+    }
+
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
+    };
+
     const move = (index, from, to) => {
         console.log(index, from, to);
-        if (from === to) {
+        if (from.match(to)) {
             return;
         }
-        if (from === 'fighters') {
+        if (from.includes('fighters')) {
+            const yearIndex = from.split('-')[1];
+            let year = fighters[yearIndex];
             const fightersCopy = [...fighters];
             const listsCopy = [...lists];
             const toIndex = to.split("_")[1];
             let list = lists[toIndex];
 
-            const fighter = fightersCopy.splice(index, 1);
+            const fighter = year.fighters.splice(index, 1);
             list.fighters = list.fighters.concat(fighter);
             listsCopy.splice(toIndex, 1, list);
+            fightersCopy.splice(yearIndex, 1, year);
 
             setFighters([...fightersCopy]);
             setLists([...listsCopy]);
         } else {
-            if (to === 'fighters') {
+            if (to.includes('fighters')) {
+                const yearIndex = to.split('-')[1];
+                let year = fighters[yearIndex];
+                const fightersCopy = [...fighters];
                 const listIndex = from.split("_")[1];
                 const list = lists[listIndex];
 
                 const fighter = list.fighters.splice(index, 1);
-                const fightersCopy = [...fighter, ...fighters];
+                year.fighters = [...fighter, ...year.fighters];
                 const listsCopy = [...lists];
                 listsCopy.splice(listIndex, 1, list);
+                fightersCopy.splice(yearIndex, 1, year);
 
                 setLists([...listsCopy]);
                 setFighters([...fightersCopy]);
@@ -206,9 +263,22 @@ export default function TierListMaker() {
     const clearList = (index) => {
         let listsCopy = [...lists];
         let listFighters = [...listsCopy[index].fighters];
-        let fightersCopy = [...listFighters, ...fighters];
-        listsCopy[index].fighters = [];
-        setFighters([...fightersCopy]);
+        if (listFighters.length === 0) {
+            return;
+        }
+        var allYears = [...fighters];
+        for (let i in listFighters) {
+            const fighter = listFighters[i];
+            const yearIndex = yearsByIndex[fighter.year];
+            let year = fighters[yearIndex];
+            let fightersYear = year.fighters;
+            year.fighters = [fighter, ...fightersYear];
+            allYears.splice(yearIndex, 1, year);
+        }
+        let listExcerpt = listsCopy[index];
+        listExcerpt.fighters = [];
+        listsCopy.splice(index, 1, listExcerpt);
+        setFighters([...allYears]);
         setLists([...listsCopy]);
         makeCheck();
     }
@@ -224,13 +294,14 @@ export default function TierListMaker() {
     const loadTemplate = async (fighters, templateId) => {
         try {
             const response = await axios.get(`/tierlist/${templateId}`);
+            const chooseFighters = fighters;
             if (response.data.tierList) {
                 const loadedTierList = response.data.tierList;
-                let includedFighters = loadedTierList.lists.reduce((fighters, list) => {
-                    fighters = fighters.concat(list.fighters);
-                    return fighters;
+                let includedFighters = loadedTierList.lists.reduce((f, list) => {
+                    f = f.concat(list.fighters);
+                    return f;
                 }, []);
-                let filteredFighters = fighters.filter(difference(includedFighters));
+                let filteredFighters = chooseFighters.filter(difference(includedFighters));
                 setLists([...response.data.tierList.lists]);
                 return filteredFighters;
             } else {
@@ -250,11 +321,40 @@ export default function TierListMaker() {
             const response = await axios.get('/fighters');
             if (response.data.fighters) {
                 var fighters = response.data.fighters;
+                var allFighters = fighters;
+                let fightersState = [];
+                for (let year in years) {
+                    let fightersByYear = [];
+                    if (years[year].year !== 'AS') {
+                        fightersByYear = fighters.filter(f => f.year === years[year].year).sort(f => f.isFES);
+                    } else {
+                        fightersByYear = fighters.filter(f => f.isAS).sort(f => f.isFES);
+                    }
+                    let fightersObject = {
+                        year: years[year].year,
+                        fighters: fightersByYear
+                    };
+                    fightersState = fightersState.concat(fightersObject);
+                }
                 if (loadingTemplate && templateId) {
-                    const filteredFighters = await loadTemplate(fighters, templateId);
-                    setFighters([...filteredFighters]);
+                    const filteredFighters = await loadTemplate(allFighters, templateId);
+                    let templateFighters = [];
+                    for (let year in years) {
+                        let fightersByYear = [];
+                        if (years[year].year !== 'AS') {
+                            fightersByYear = filteredFighters.filter(f => f.year === years[year].year).sort(f => f.isFES);
+                        } else {
+                            fightersByYear = filteredFighters.filter(f => f.isAS).sort(f => f.isFES);
+                        }
+                        let fightersObject = {
+                            year: years[year].year,
+                            fighters: fightersByYear
+                        };
+                        templateFighters = templateFighters.concat(fightersObject);
+                    }
+                    setFighters([...templateFighters]);
                 } else {
-                    setFighters([...fighters]);
+                    setFighters([...fightersState]);
                 }
             } else {
                 setError(response.data.error);
@@ -270,10 +370,13 @@ export default function TierListMaker() {
     const saveChanges = async () => {
         setLoading(true);
         setSuccess(false);
+        setShare(false);
         try {
             const response = await axios.post('/tierlist', { lists, belongsTo: user ? user._id : null });
             if (response.data.tierList) {
                 setSuccess('Tier List Created');
+                setShare(true);
+                setTierList(response.data.tierList);
             } else {
                 setError(error);
             }
@@ -320,7 +423,8 @@ export default function TierListMaker() {
     const [{ hovered }, dropRef] = useDrop({
         accept: 'CARD',
         drop(item, monitor) {
-            move(item.index, item.from, 'fighters')
+            const yearIndex = yearsByIndex[item.year];
+            move(item.index, item.from, `fighters-${yearIndex}`);
         },
         collect: monitor => {
             return {
@@ -328,6 +432,23 @@ export default function TierListMaker() {
             }
         }
     });
+
+    function TabPanel(props) {
+        const { children, value, index, ...other } = props;
+
+        return (
+            <Typography
+                component="div"
+                role="tabpanel"
+                hidden={value !== index}
+                id={`scrollable-force-tabpanel-${index}`}
+                aria-labelledby={`scrollable-force-tab-${index}`}
+                {...other}
+            >
+                {value === index && <Box p={3}>{children}</Box>}
+            </Typography>
+        );
+    }
 
     return <>
         {
@@ -339,18 +460,45 @@ export default function TierListMaker() {
         <TierListContext.Provider value={{ ...values }}>
             <Container style={{ padding: '0' }} maxWidth="xl" className={classes.root}>
                 <Grid container>
-                    <Grid type="fighters" ref={dropRef} item xs={12} md={4}
+                    <Grid ref={dropRef} type="fighters" item xs={12} md={4}
                         className={clsx(classes.fightersContainer, classes.item1, { [classes.hovered]: hovered })}>
-                        <div className={classes.fightersWrapper}>
-                            {
-                                loadingFighters && <Loading />
-                            }
-                            {
-                                fighters && !loadingFighters && fighters.map((fighter, index) => {
-                                    return <DraggableFighter key={index} fighter={fighter} index={index} from="fighters" />
-                                })
-                            }
-                        </div>
+                        <AppBar position="static" color="default">
+                            <Tabs
+                                value={value}
+                                onChange={handleChange}
+                                indicatorColor="primary"
+                                textColor="primary"
+                                variant="scrollable"
+                                scrollButtons="auto"
+                                aria-label="scrollable auto"
+                            >
+                                {
+                                    years && years.map((year, index) => {
+                                        return <Tab
+                                            key={index}
+                                            icon={<GenericIcon image={year.image} year={year.year} />}
+                                            {...a11yProps(index)}
+                                        />
+                                    })
+                                }
+                            </Tabs>
+                        </AppBar>
+                        {
+                            fighters && years.map((year, index) => {
+                                return <TabPanel key={index} value={value} index={index}>
+                                    <div className={classes.fightersWrapper}>
+                                        {
+                                            loadingFighters && <Loading />
+                                        }
+                                        {
+                                            fighters[index] && fighters[index].fighters && !loadingFighters && fighters[index].fighters.map((fighter, id) => {
+                                                return <DraggableFighter key={id} fighter={fighter} index={id} from={`fighters-${index}`} />
+                                            })
+                                        }
+                                    </div>
+                                </TabPanel>
+                            })
+                        }
                     </Grid>
                     <Grid item xs={12} md={8} className={clsx(classes.tierContainer, classes.item2)}>
                         <div style={{ width: '100%' }}>
@@ -363,27 +511,26 @@ export default function TierListMaker() {
                                         <Typography variant="h5">Tier List Maker</Typography>
                                         <hr />
                                         <div className={classes.alignAction}>
-                                            <IconButton className={classes.iconButton}
-                                                size="small"
-                                                onClick={() => addItemList()}
-                                                disabled={lists.length >= 6}
-                                            >
-                                                <FaPlus
-                                                    className={clsx(classes.plusIcon, { [classes.plusIconDisabled]: lists.length >= 6 })}
-                                                />
-                                            </IconButton>
+                                            <Button variant="contained" color="primary" onClick={() => addItemList()}
+                                                disabled={lists.length >= 6}>
+                                                Add a list <FaPlus style={{ marginLeft: '20px' }} />
+                                            </Button>
                                             <Button
                                                 disabled={!check || loading}
                                                 className={clsx(classes.button, { [classes.disabledButton]: (!check || loading) })}
                                                 onClick={() => saveChanges()}
                                             >Save Changes</Button>
                                         </div>
+                                        {
+                                            share && tierList && <div style={{ margin: '20px 0'}}>
+                                                <ShareComponent tierlist={tierList._id} dark />
+                                            </div>
+                                        }
                                     </Grid>
                                     <Grid item xs={12} className={classes.innerListSection}>
                                         {
                                             lists && lists.length === 0 && <Typography variant="h6">There is no categories to show</Typography>
                                         }
-
                                         {
                                             lists && lists.map((list, index) => {
                                                 return <Grid key={index} container>

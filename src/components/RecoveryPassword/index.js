@@ -10,11 +10,8 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import FormControl from '@material-ui/core/FormControl';
 import CustomMessage from '../CustomMessage/index';
 import { FaEnvelope } from 'react-icons/fa';
-import { FaKey } from 'react-icons/fa';
-import { login, setCurrentUser } from '../../services/Auth';
-import { withRouter, Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import constants from '../../constants';
-import { useDispatch } from 'react-redux';
 import axios from '../../axios';
 
 const useStyles = makeStyles(theme => createStyles({
@@ -49,15 +46,11 @@ function RecoveryPassword({ history }) {
   const classes = useStyles();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(false);
   const [success, setSuccess] = useState(false);
 
   function handleEmailChange(event) {
     setEmail(event.target.value);
-  }
-
-  function handleError(message) {
-    setError(message);
   }
 
   async function recoveryPassword() {
@@ -69,26 +62,27 @@ function RecoveryPassword({ history }) {
     };
 
     if (email === '') {
-      handleError('Preencha todos os campos !');
+      setError('Fill all the fields');
       return;
     }
 
     setLoading(true);
 
     try {
-      const response = await axios.post('/api/index.php/user?recovery=true', { ...data });
+      const response = await axios.post('/recovery', { ...data });
+      console.log(response);
       if (response.data.success) {
-        console.log(response.data);
-        setLoading(false);
-        setSuccess('Nova senha enviada para o email');
+        setSuccess('New password sent to your email');
         window.setTimeout(() => {
-          history.push(constants.autenticar);
+          history.push(constants.SIGN_IN);
         }, 3000);
       } else {
-        handleError('Não foi possível alterar a senha');
+        setError(response.data.error);
       }
+      setLoading(false);
     } catch (error) {
-      handleError('Não foi possível alterar a senha');
+      console.log(error);
+      setError('Unable to send an email right now ! Try again later !');
       setLoading(false);
     }
   }
@@ -102,7 +96,7 @@ function RecoveryPassword({ history }) {
         success && <CustomMessage handleClose={() => setSuccess(false)} message={success} open={success ? true : false} type="success" />
       }
       <Paper elevation={3} className={clsx(classes.wrapper)}>
-        <Typography className={classes.item} variant="h6">Recuperar Senha</Typography>
+        <Typography className={classes.item} variant="h6">Recovery Password</Typography>
         <FormControl>
           <InputLabel htmlFor="input-email">Email</InputLabel>
           <Input
@@ -118,7 +112,7 @@ function RecoveryPassword({ history }) {
           />
 
         </FormControl>
-        <Button onClick={() => recoveryPassword()} disabled={loading} variant="contained" color="primary">Enviar</Button>
+        <Button onClick={() => recoveryPassword()} disabled={loading} variant="contained" color="primary">Send</Button>
       </Paper>
     </div >
   );

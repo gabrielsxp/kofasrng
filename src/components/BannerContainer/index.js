@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import DashboardContext from '../Dashboard/context';
 import moment from 'moment';
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
@@ -128,6 +129,7 @@ export default function BannerContainer() {
     const from = useSelector(state => state.fromDate);
     const to = useSelector(state => state.toDate);
     const dispatch = useDispatch();
+    const {setCurrentItem} = useContext(DashboardContext);
 
     const loadBanners = async () => {
         setLoading(true);
@@ -404,7 +406,8 @@ export default function BannerContainer() {
                 <Grid container>
                     <Grid item xs={12} md={6} className={classes.grid}>
                         <FormGroup>
-                            <Typography className={classes.title} variant="h5">Banner Management</Typography>
+                            <Typography className={classes.title} variant="h5">Create Banner</Typography>
+                            <Typography style={{marginTop: '20px', marginBottom: '20px'}}>All banners must contain a name (min 6 characters), costs, a pool, a image (paste the link on the field), and the min fighters rates must be 0 and the max fighters rates must be 99. After that, the button on the bottom of the page will unlock</Typography>
                             {
                                 banners && banners.length > 0 && <FormControl style={{ marginTop: '10px' }}>
                                     <FormControlLabel
@@ -646,6 +649,7 @@ export default function BannerContainer() {
             </Container>
                 : !loadPool && <Container style={{ padding: '80px 20px' }}>
                     <Typography variant="h6" style={{ marginBottom: '20px' }}>You do not have any pools yet</Typography>
+                    <Button variant="contained" color="primary" onClick={() => setCurrentItem(5)}>Create a Pool</Button>
                 </Container>
         }
         {loadPool && <Loading />}

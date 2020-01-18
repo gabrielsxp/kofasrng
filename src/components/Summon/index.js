@@ -283,6 +283,7 @@ export default function Summon() {
     }
 
     useEffect(() => {
+        window.scrollTo(0, 0);
         getBanner();
         let us = getCurrentUser();
         if (us) {
@@ -420,7 +421,7 @@ export default function Summon() {
             {
                 banner && !loading && <>
                     {rates && <Rates />}
-                    <div style={{width: '100%', padding: '20px'}}>
+                    <div style={{ width: '100%', padding: '20px' }}>
                         <Typography className={classes.title} variant="h4">{banner.name} Summon</Typography>
                         <div className={classes.justify}>
                             <ShareComponent banner={banner.slug} dark />

@@ -13,6 +13,7 @@ import Loading from '../Loading/index';
 import Footer from '../Footer/index';
 import Typography from '@material-ui/core/Typography';
 import axios from '../../axios';
+import TopLanding from '../TopLanding/index';
 import constants from '../../constants';
 
 const useStyles = makeStyles(theme => ({
@@ -120,8 +121,9 @@ export default function BannerSection() {
     return <>
         {error && <CustomMessage type="error" message={error} handleClose={handleClose} open={error ? true : false} />}
         <Container className={classes.section}>
+            <Typography style={{marginBottom: '20px'}}>*This page refers only to content created by registered users</Typography>
             <div className={classes.alignCenter}>
-                <Typography className={classes.title} variant="h6">Choose the Banner to Pull</Typography>
+                <Typography className={classes.title} variant="h6">Choose a Banner to Pull</Typography>
                 <div className={classes.alignFilter}>
                     <FormControl className={classes.formControl}>
 
@@ -158,6 +160,7 @@ export default function BannerSection() {
                     </div>
                 }
             </Grid>
+            <TopLanding frontPage={false} />
         </Container>
         <Footer />
     </>

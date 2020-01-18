@@ -363,12 +363,15 @@ export default function PoolContainer() {
         }
         <Container ref={dropRef} className={clsx({ [classes.hovered]: hovered }, classes.section)}>
             <Grid container>
+                <Grid item xs={12} className={classes.grid}>
+                    <Typography variant="h5">Create Default Pool</Typography>
+                    <Typography style={{marginTop: '20px'}}>All pools must contain a name (min 6 characters) and at least 1 Bronze Fighter, 1 Silver Fighter and 1 Gold Fighter. After that the Button in the bottom of the page will enable</Typography>
+                </Grid>
                 <Grid item md={5} className={classes.grid}>
                     <div>
                         {
                             !updateMode && <FormGroup>
                                 <FormControl>
-                                    <Typography variant="h5">Create Default Pool</Typography>
                                     <TextField style={{ margin: '15px 0' }} helperText="Must contain at least 6 characters" id="standard-basic" label="Pool Name" variant="outlined" onChange={(event) => handlePoolNameChange(event)} value={poolName} />
                                 </FormControl>
                             </FormGroup>

@@ -29,7 +29,7 @@ const useStyles = makeStyles(theme => ({
 export default function DraggableFighter({ fighter, index, from }) {
     const classes = useStyles();
     const [{ isDragging }, dragRef] = useDrag({
-        item: { type: 'CARD', index, from },
+        item: { type: 'CARD', index, from, year: fighter.year },
         collect: monitor => ({
             isDragging: monitor.isDragging()
         })

@@ -3,7 +3,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import { FaHeart } from 'react-icons/fa';
 import IconButton from '@material-ui/core/IconButton';
 import CustomMessage from '../CustomMessage/index';
+import OutlinedInput from '@material-ui/core/OutlinedInput';
 import Tooltip from '@material-ui/core/Tooltip';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import { FaLink } from 'react-icons/fa';
 import {
     FacebookShareButton,
     FacebookIcon,
@@ -25,11 +28,34 @@ const useStyles = makeStyles(theme => ({
             alignItems: 'center',
             flexDirection: 'column'
         }
+    },
+    outline: {
+        border: 'none',
+        color: props =>  props.dark ? 'rgba(0,0,0,0.48)' : "#fff",
+        '& button': {
+            color: props => props.dark ? 'rgba(0,0,0,0.48)' : "#fff"
+        }
     }
 }));
 
+function copyClipboard(type) {
+    /* Get the text field */
+    const id = type === 'summon' ? 
+        "outlined-share-link-summon" : type === 'tierlist' ? 
+        "outlined-share-link-tierlist" : type === 'banner' ? 
+        "outlined-share-link-banner" : null;
+    var copyText = document.getElementById(id);
+  
+    /* Select the text field */
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+  
+    /* Copy the text inside the text field */
+    document.execCommand("copy");
+  }
+
 export default function ShareComponent({ summon, tierlist, banner, hasUser, dark }) {
-    const classes = useStyles();
+    const classes = useStyles({dark});
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState(false);
 
@@ -136,6 +162,66 @@ export default function ShareComponent({ summon, tierlist, banner, hasUser, dark
                             <WhatsappIcon size={32} round />
                         </WhatsappShareButton>
                     </>
+                }
+                {
+                    tierlist && <OutlinedInput
+                        id="outlined-share-link-tierlist"
+                        type="text"
+                        style={{marginBottom: '10px'}}
+                        className={classes.outline}
+                        value={`${constants.SHARE_BASE_TIER_URL + tierlist}`}
+                        endAdornment={
+                            <InputAdornment position="end">
+                                <IconButton
+                                    aria-label="copy to clipboard"
+                                    edge="end"
+                                    onClick={() => copyClipboard("tierlist")}
+                                >
+                                    <FaLink />
+                                </IconButton>
+                            </InputAdornment>
+                        }
+                    ></OutlinedInput>
+                }
+                {
+                    summon && <OutlinedInput
+                        id="outlined-share-link-summon"
+                        type="text"
+                        style={{marginBottom: '10px'}}
+                        className={classes.outline}
+                        value={`${constants.SHARE_BASE_URL + summon}`}
+                        endAdornment={
+                            <InputAdornment position="end">
+                                <IconButton
+                                    aria-label="copy to clipboard"
+                                    edge="end"
+                                    onClick={() => copyClipboard("summon")}
+                                >
+                                    <FaLink />
+                                </IconButton>
+                            </InputAdornment>
+                        }
+                    ></OutlinedInput>
+                }
+                {
+                    banner && <OutlinedInput
+                        id="outlined-share-link-banner"
+                        type="text"
+                        style={{marginBottom: '10px'}}
+                        className={classes.outline}
+                        value={`${constants.SHARE_BASE_BANNER_URL + summon}`}
+                        endAdornment={
+                            <InputAdornment position="end">
+                                <IconButton
+                                    aria-label="copy to clipboard"
+                                    edge="end"
+                                    onClick={() => copyClipboard("banner")}
+                                >
+                                    <FaLink />
+                                </IconButton>
+                            </InputAdornment>
+                        }
+                    ></OutlinedInput>
                 }
             </div>
         </div>

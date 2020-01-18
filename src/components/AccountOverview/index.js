@@ -135,7 +135,7 @@ export default function AccountOverview() {
         {error && <CustomMessage type="error" message={error} handleClose={handleClose} open={error ? true : false} />}
         <Container className={classes.section}>
             <Grid container>
-                <Grid xs={12} className={classes.grid}>
+                <Grid item xs={12} className={classes.grid}>
                     <FormGroup>
                         <Typography className={classes.title} variant="h5">Account Overview</Typography>
                     </FormGroup>

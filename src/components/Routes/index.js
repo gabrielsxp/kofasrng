@@ -11,6 +11,7 @@ import Privacy from '../Privacy/index';
 import Terms from '../Terms/index';
 import Pull from '../Pull/index';
 import TierListMaker from '../TierListMaker/index';
+import RecoveryPassword from '../RecoveryPassword/index';
 import TierLists from '../TierLists/index';
 import TierList from '../TierList/index';
 import { BrowserRouter as Router, Switch, Redirect, Route } from 'react-router-dom';
@@ -48,6 +49,7 @@ export default function Routes() {
         <Route path={constants.TIER_LIST_MAKER} component={TierListMaker}></Route>
         <Route path={constants.TIER_LISTS} component={TierLists}></Route>
         <Route path={constants.TIER_LIST} component={TierList}></Route>
+        <Route path={constants.RECOVERY} component={RecoveryPassword}></Route>
         <Route path={constants.PRIVACY} exact>{Privacy}</Route>
         <Route path={constants.TERMS} exact>{Terms}</Route>
         <PrivateRoute path={`${constants.ADMIN}`} exact component={Dashboard}></PrivateRoute>

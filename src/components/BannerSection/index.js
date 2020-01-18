@@ -65,7 +65,7 @@ export default function BannerSection() {
     const [banners, setBanners] = useState([]);
     const [error, setError] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [filter, setFilter] = useState(0);
+    const [filter, setFilter] = useState(3);
 
     const handleChange = (event) => {
         setFilter(event.target.value);
@@ -113,7 +113,7 @@ export default function BannerSection() {
         {error && <CustomMessage type="error" message={error} handleClose={handleClose} open={error ? true : false} />}
         <Container className={classes.section}>
             <div className={classes.alignCenter}>
-                <Typography className={classes.title} variant="h6">Choose the Banner to Pull</Typography>
+                <Typography className={classes.title} variant="h6">Choose a Banner to Pull</Typography>
                 <div className={classes.alignFilter}>
                     <FormControl className={classes.formControl}>
                         <Select

@@ -6,12 +6,17 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import Radio from '@material-ui/core/Radio';
 import Grid from '@material-ui/core/Grid';
+import FighterCard from '../FighterCard/index';
 import Container from '@material-ui/core/Container';
 import Loading from '../Loading/index';
 import CustomMessage from '../CustomMessage/index';
 import Typography from '@material-ui/core/Typography';
-import FighterCard from '../FighterCard/index';
 import { getCurrentUser } from '../../services/Auth/index';
+import AppBar from '@material-ui/core/AppBar';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import Box from '@material-ui/core/Box';
+import constants from '../../constants';
 import axios from '../../axios';
 
 const useStyles = makeStyles(theme => ({
@@ -24,41 +29,60 @@ const useStyles = makeStyles(theme => ({
     },
     grid: {
         padding: '20px'
+    },
+    fightersWrapper: {
+        display: 'flex',
+        flexWrap: 'wrap'
+    },
+    iconYear: {
+        width: '100px',
+        height: 'auto'
     }
 }));
 
-const filterOptions = [
-    { value: '94' },
-    { value: '95' },
-    { value: '96' },
-    { value: '97' },
-    { value: '98' },
-    { value: '99' },
-    { value: '00' },
-    { value: '01' },
-    { value: '02' },
-    { value: '03' },
-    { value: 'XII' },
-    { value: 'XIII' },
-    { value: 'XIV' },
-    { value: 'Fes' },
-    { value: 'AS' },
-    { value: 'All' },
-]
+function a11yProps(index) {
+    return {
+        id: `scrollable-auto-tab-${index}`,
+        'aria-controls': `scrollable-auto-tabpanel-${index}`,
+    };
+}
+
+const years = [
+    { year: '94', image: `${constants.YEARS}/KOF94_logo.webp` },
+    { year: '95', image: `${constants.YEARS}/KOF95_logo.webp` },
+    { year: '96', image: `${constants.YEARS}/KOF96_logo.webp` },
+    { year: '97', image: `${constants.YEARS}/KOF97_logo.webp` },
+    { year: '98', image: `${constants.YEARS}/KOF98_logo.webp` },
+    { year: '99', image: `${constants.YEARS}/KOF99_logo.webp` },
+    { year: '00', image: `${constants.YEARS}/KOF00_logo.webp` },
+    { year: '01', image: `${constants.YEARS}/KOF01_logo.webp` },
+    { year: '02', image: `${constants.YEARS}/KOF02UM_logo.webp` },
+    { year: '03', image: `${constants.YEARS}/KOF03_logo.webp` },
+    { year: 'XII', image: `${constants.YEARS}/KOF12_logo.webp` },
+    { year: 'XIII', image: `${constants.YEARS}/KOFXIII_logo.webp` },
+    { year: 'XIV', image: `${constants.YEARS}/KOFXIV_logo.webp` },
+    { year: 'AS', image: `${constants.YEARS}/KOFAS_logo.webp` },
+];
 
 export default function FighterCollection() {
     const classes = useStyles();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
     const [fighters, setFighters] = useState(null);
-    const [allFighters, setAllFighters] = useState(null);
-    const [selected, setSelected] = useState("All");
     const [user, setUser] = useState(null);
+    const [value, setValue] = useState(0);
 
     const handleClose = () => {
         setError(false);
     }
 
+    const GenericIcon = ({ image, year }) => {
+        return <img className={classes.iconYear} src={image} alt={year} />
+    }
+
+    const handleChangeValue = (event, newValue) => {
+        setValue(newValue);
+    };
 
     function difference(selected) {
         return (fighter) => {
@@ -90,8 +114,22 @@ export default function FighterCollection() {
                     }
                     collected = collected.concat(diff);
 
-                    setFighters([...collected]);
-                    setAllFighters([...collected]);
+                    let fightersState = [];
+                    for (let year in years) {
+                        let fightersByYear = [];
+                        if (years[year].year !== 'AS') {
+                            fightersByYear = collected.filter(f => f.year === years[year].year).sort(f => f.isFES);
+                        } else {
+                            fightersByYear = collected.filter(f => f.isAS).sort(f => f.isFES);
+                        }
+                        let fightersObject = {
+                            year: years[year].year,
+                            fighters: fightersByYear
+                        };
+                        fightersState = fightersState.concat(fightersObject);
+                    }
+
+                    setFighters([...fightersState]);
                 }
             } else {
                 setError(response.data.error);
@@ -104,18 +142,6 @@ export default function FighterCollection() {
         }
     }
 
-    const filterFighters = async (year) => {
-        if (selected === 'All') {
-            setFighters([...allFighters]);
-            return;
-        }
-        setLoading(true);
-        const filtered = await allFighters.filter(f => f.year === year);
-        setLoading(false);
-
-        setFighters([...filtered]);
-    }
-
     useEffect(() => {
         const us = getCurrentUser();
         if (us) {
@@ -124,22 +150,21 @@ export default function FighterCollection() {
         }
     }, []);
 
-    const handleChange = (event) => {
-        setSelected(event.target.value);
-        filterFighters(event.target.value);
-    }
+    function TabPanel(props) {
+        const { children, value, index, ...other } = props;
 
-    const RadioFilter = () => {
-        return <FormControl component="fieldset" className={classes.formControl}>
-            <FormLabel component="legend">Filter by Year</FormLabel>
-            <RadioGroup aria-label="gender" name="gender1" value={selected} onChange={handleChange} style={{ display: 'inline-block' }}>
-                {
-                    filterOptions && filterOptions.map((filter, index) => {
-                        return <FormControlLabel key={index} value={filter.value} control={<Radio />} label={filter.value} />
-                    })
-                }
-            </RadioGroup>
-        </FormControl>
+        return (
+            <Typography
+                component="div"
+                role="tabpanel"
+                hidden={value !== index}
+                id={`scrollable-force-tabpanel-${index}`}
+                aria-labelledby={`scrollable-force-tab-${index}`}
+                {...other}
+            >
+                {value === index && <Box p={3}>{children}</Box>}
+            </Typography>
+        );
     }
 
     return <>
@@ -154,14 +179,45 @@ export default function FighterCollection() {
                             <Typography className={classes.title} variant="h5">Collected Fighters</Typography>
                             {
                                 fighters && fighters.length > 0 ? <>
-                                    {/* <RadioFilter /> */}
-                                    <div style={{ display: 'flex', width: '100%', flexWrap: 'wrap', justifyContent: 'flex-start', border: '5px solid #dedede', borderRadius: '5px' }}>
-                                        {
-                                            user && fighters && fighters.map((fighter, index) => {
-                                                return <FighterCard notCollected={!fighter.collected} display fighter={fighter} key={index} />
-                                            })
-                                        }
-                                    </div>
+                                    <AppBar position="static" color="default">
+                                        <Tabs
+                                            value={value}
+                                            onChange={handleChangeValue}
+                                            indicatorColor="primary"
+                                            textColor="primary"
+                                            variant="scrollable"
+                                            scrollButtons="auto"
+                                            aria-label="scrollable auto"
+                                        >
+                                            {
+                                                years && years.map((year, index) => {
+                                                    return <Tab
+                                                        key={index}
+                                                        icon={<GenericIcon image={year.image} year={year.year} />}
+                                                        {...a11yProps(index)}
+                                                    />
+                                                })
+                                            }
+                                        </Tabs>
+                                    </AppBar>
+                                    {
+                                        fighters && years.map((year, index) => {
+                                            return <TabPanel key={index} value={value} index={index}>
+                                                <Grid container>
+                                                    {
+                                                        loading && <Loading />
+                                                    }
+                                                    {
+                                                        fighters[index] && fighters[index].fighters && !loading && fighters[index].fighters.map((fighter, id) => {
+                                                            return <Grid item xs={6} md={4} lg={2}>
+                                                                <FighterCard notCollected={!fighter.collected} display key={id} fighter={fighter} index={id} from={`fighters-${index}`} />
+                                                            </Grid>
+                                                        })
+                                                    }
+                                                </Grid>
+                                            </TabPanel>
+                                        })
+                                    }
                                 </> : <Typography>You did not collect any fighters yet</Typography>
                             }
                         </Grid>
