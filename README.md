@@ -10,6 +10,8 @@ The King of Fighters All Star é um jogo mobile que eu gosto bastante e jogo des
 - Javascript
 - React JS
 
+A API Rest para essa aplicação está em [The King of Fighters All Star Tools - API REST](https://github.com/gabrielsxp/kofrng-api)
+
 ## Funcionalidades
 - Invocação de um ou dez personagens ao mesmo tempo
 - Sistema de ranqueamento das invocações, de modo que a refletir a melhor invocação do dia (atualizada a cada 10 minutos)
