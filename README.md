@@ -1,5 +1,7 @@
 # The King of Fighters All Star Tools - Frond End
-
+<p align="center">
+  <img src="https://github.com/gabrielsxp/kofasrng/blob/master/kof.gif" alt="Kof all star landing"></img>
+ </p>
 The King of Fighters All Star é um jogo mobile que eu gosto bastante e jogo desde o lançamento em outro de 2019. Para a obtenção de novos personagens no jogo, o jogador deve obter rubis para realizar a invocação de um ou dez personagens ao mesmo tempo. A ideia deste projeto consiste em simular tais invocações, permitindo também a qualquer usuário registrado a criação customizada de qualquer banner de invocação presente no jogo.
 
 ### Tecnologias Utilizadas
